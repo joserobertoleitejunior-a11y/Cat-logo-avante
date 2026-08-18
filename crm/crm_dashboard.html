@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVANTE — Painel Admin (protótipo)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230B2A52'/%3E%3Ctext x='50' y='66' font-size='46' font-family='Arial,sans-serif' font-weight='bold' fill='%23E8AE30' text-anchor='middle'%3EAD%3C/text%3E%3C/svg%3E">
+<script>
+// aplica o tema salvo antes da primeira pintura (mesmo mecanismo do catálogo, pra não piscar)
+(function(){
+  try{
+    var t = localStorage.getItem('avante_admin_theme');
+    if(t === 'light') document.documentElement.setAttribute('data-theme','light');
+  }catch(e){}
+})();
+</script>
+<style>
+  :root{
+    --navy:#0b2a52; --navy2:#123b70; --gold:#e6b325; --gold-deep:#c6890f; --red:#c81f2b;
+    --bg1:#0a1a30; --bg2:#050f1e; --panel:#0f2444; --panel2:#0c1d38; --line:rgba(255,255,255,.1);
+    --txt:#eef2f8; --sub:#9fb0c8;
+    --wa:#25d366; --ig:#e1306c; --site:#4aa3ff;
+  }
+  html[data-theme="light"]{
+    --bg1:#FFF8EC; --bg2:#FFEFD6; --panel:#FFFFFF; --panel2:#FFF9EE; --line:rgba(43,33,24,.12);
+    --txt:#2B2118; --sub:#7A6A57;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:var(--txt); font-family:'Segoe UI',Arial,sans-serif; min-height:100vh; transition:background .25s;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  /* ---------- Login ---------- */
+  #loginScreen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .login-card{
+    width:100%; max-width:380px; background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:32px 28px; box-shadow:0 24px 60px rgba(0,0,0,.35);
+  }
+  .login-card .lg-brand{ display:flex; align-items:center; gap:10px; margin-bottom:6px; font-weight:800; font-size:19px; }
+  .login-card .lg-brand .dot{ width:11px; height:11px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
+  .login-card .lg-sub{ color:var(--sub); font-size:12.5px; margin-bottom:24px; }
+  .login-card label{ display:block; font-size:11.5px; color:var(--sub); margin:14px 0 5px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+  .login-card select, .login-card input{
+    width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:10px;
+    padding:11px 12px; font-size:14px;
+  }
+  .login-card .err{ color:#f87171; font-size:12px; margin-top:10px; display:none; }
+  .login-card button{
+    width:100%; margin-top:22px; background:linear-gradient(135deg,var(--gold),#f6c863); color:#3a2a00; border:none;
+    font-weight:800; padding:12px; border-radius:10px; cursor:pointer; font-size:14px;
+  }
+  .login-note{ margin-top:18px; font-size:11px; color:var(--sub); line-height:1.5; background:rgba(230,179,37,.1); border:1px solid rgba(230,179,37,.3); border-radius:10px; padding:10px 12px; }
+
+  /* ---------- Shell ---------- */
+  header{
+    display:flex; align-items:center; justify-content:space-between; padding:14px 20px;
+    background:rgba(0,0,0,.18); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:30;
+    flex-wrap:wrap; gap:10px;
+  }
+  html[data-theme="light"] header{ background:rgba(255,255,255,.7); backdrop-filter:blur(6px); }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700;}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
+  nav{display:flex; gap:4px; background:rgba(128,128,128,.12); border-radius:10px; padding:4px; overflow-x:auto; max-width:62vw;}
+  nav button{background:transparent; border:none; color:var(--sub); padding:8px 13px; border-radius:7px; font-size:12.5px; cursor:pointer; white-space:nowrap; font-weight:600; transition:background .18s ease, color .18s ease, transform .12s ease;}
+  nav button.active{background:var(--gold); color:#3a2a00; font-weight:700;}
+  nav button:not(.active):hover{ background:rgba(128,128,128,.2); }
+  nav button:active{ transform:scale(.95); }
+  .hdr-right{ display:flex; align-items:center; gap:8px; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--panel2); color:var(--txt);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .who-badge{ display:flex; align-items:center; gap:8px; background:var(--panel2); border:1px solid var(--line); border-radius:999px; padding:5px 12px 5px 5px; font-size:12px; }
+  .who-badge .av{ width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; }
+  .btn-ghost-sm{ background:transparent; border:1px solid var(--line); color:var(--sub); border-radius:8px; padding:5px 10px; font-size:11.5px; cursor:pointer; }
+
+  .banner-alert{
+    max-width:1400px; margin:12px auto 0; padding:10px 16px; background:rgba(230,179,37,.12);
+    border:1px solid rgba(230,179,37,.4); border-radius:8px; font-size:12.5px; color:#caa032;
+  }
+  html[data-theme="dark"] .banner-alert, :root:not([data-theme]) .banner-alert{ color:#ffe9ad; }
+  main{ max-width:1400px; margin:0 auto; padding:16px 20px 60px; }
+  .view{ display:none; }
+  .view.active{ display:block; animation:viewFadeIn .32s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes viewFadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+  h2.view-title{ font-size:19px; margin:4px 0 16px; }
+  h2.view-title .sub{ display:block; font-size:12px; font-weight:400; color:var(--sub); margin-top:3px; }
+  .kpi-card{ animation:kpiIn .4s cubic-bezier(.16,1,.3,1) both; animation-delay:var(--kpi-delay,0ms); }
+  @keyframes kpiIn{ from{ opacity:0; transform:translateY(10px) scale(.97); } to{ opacity:1; transform:none; } }
+  .login-card{ animation:loginIn .45s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes loginIn{ from{ opacity:0; transform:translateY(14px) scale(.98); } to{ opacity:1; transform:none; } }
+  tbody tr{ animation:rowIn .3s ease both; animation-delay:var(--row-delay,0ms); }
+  @keyframes rowIn{ from{ opacity:0; } to{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){
+    .view.active, .kpi-card, .login-card, tbody tr{ animation:none!important; }
+  }
+
+  /* ---------- Dashboard ---------- */
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:18px; }
+  .kpi-card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .kpi-card .kpi-label{ font-size:11px; color:var(--sub); text-transform:uppercase; letter-spacing:.4px; font-weight:700; }
+  .kpi-card .kpi-value{ font-size:26px; font-weight:800; margin-top:6px; }
+  .kpi-card .kpi-delta{ font-size:11px; margin-top:5px; font-weight:700; }
+  .kpi-card .kpi-delta.up{ color:#4ade80; } .kpi-card .kpi-delta.flat{ color:var(--sub); }
+  .dash-grid{ display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
+  @media (max-width:900px){ .dash-grid{ grid-template-columns:1fr; } }
+  .panel-box{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .panel-box h4{ margin:0 0 12px; font-size:13.5px; }
+  .top-prod{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed var(--line); font-size:12.5px; }
+  .top-prod:last-child{ border-bottom:none; }
+  .top-prod .tp-bar{ height:5px; border-radius:3px; background:linear-gradient(90deg,var(--gold),#f6c863); margin-top:4px; }
+
+  /* ---------- Pipeline / Kanban ---------- */
+  .kanban{ display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; }
+  .col{ flex:0 0 260px; background:rgba(128,128,128,.05); border:1px solid var(--line); border-radius:12px; padding:10px; }
+  .col h4{ margin:2px 4px 10px; font-size:12.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--sub); display:flex; justify-content:space-between; }
+  .col h4 span.count{ background:rgba(128,128,128,.18); border-radius:20px; padding:1px 8px; color:var(--txt); }
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:8px;
+    cursor:pointer; transition:.15s;
+  }
+  .card:hover{ border-color:var(--gold); transform:translateY(-1px); }
+  .card .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:6px; }
+  .card .name{ font-weight:700; font-size:13px; }
+  .badge{ font-size:9.5px; font-weight:700; padding:2px 6px; border-radius:5px; white-space:nowrap; }
+  .badge.wa{ background:rgba(37,211,102,.18); color:#1d9e56; } .badge.ig{ background:rgba(225,48,108,.18); color:#c4235f; } .badge.site{ background:rgba(74,163,255,.18); color:#2778d6; }
+  html:not([data-theme="light"]) .badge.wa{ color:#7be6a4; } html:not([data-theme="light"]) .badge.ig{ color:#f490b3; } html:not([data-theme="light"]) .badge.site{ color:#93c6ff; }
+  .card .snippet{ font-size:11.5px; color:var(--sub); margin-top:5px; line-height:1.4; }
+  .card .meta{ font-size:10.5px; color:var(--sub); margin-top:7px; display:flex; justify-content:space-between; }
+  .consultor-chip{ display:inline-flex; align-items:center; gap:4px; font-size:10px; color:var(--gold-deep); }
+
+  /* ---------- Contatos ---------- */
+  .toolbar{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+  .toolbar input{ flex:1 1 240px; background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:8px; padding:9px 12px; }
+  .chip{ border:1px solid var(--line); background:var(--panel2); color:var(--txt); border-radius:999px; padding:6px 12px; font-size:12px; cursor:pointer; }
+  .chip.active{ background:var(--gold); color:#3a2a00; font-weight:700; border-color:var(--gold); }
+  .btn-primary{ background:linear-gradient(135deg,var(--gold),#f6c863); color:#3a2a00; border:none; font-weight:700; padding:9px 16px; border-radius:8px; cursor:pointer; font-size:13px; }
+  .btn-wa{ background:var(--wa); color:#fff; border:none; font-weight:700; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:12.5px; display:inline-flex; align-items:center; gap:6px; }
+  table.contacts{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.contacts th{ text-align:left; color:var(--sub); font-weight:600; padding:8px 10px; border-bottom:1px solid var(--line); text-transform:uppercase; font-size:10.5px; letter-spacing:.4px; }
+  table.contacts td{ padding:9px 10px; border-bottom:1px solid var(--line); }
+  table.contacts tr:hover td{ background:rgba(128,128,128,.05); }
+  .dot-status{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+  .dot-status.ativo{ background:#4ade80; } .dot-status.lead{ background:var(--gold); } .dot-status.perdido{ background:#f87171; }
+
+  /* ---------- Novo cliente form ---------- */
+  .inline-form{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; display:none; }
+  .inline-form.show{ display:block; }
+  .inline-form .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:600px){ .inline-form .grid2{ grid-template-columns:1fr; } }
+  .inline-form label{ display:block; font-size:11px; color:var(--sub); margin:9px 0 4px; font-weight:700; }
+  .inline-form input, .inline-form select, .inline-form textarea{
+    width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:8px; padding:9px 11px; font-size:13px;
+  }
+  .inline-form textarea{ resize:vertical; min-height:60px; font-family:inherit; }
+  .inline-form .actions{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+
+  /* ---------- Agenda ---------- */
+  .agenda-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+  .btn-ghost{ background:rgba(128,128,128,.1); color:var(--txt); border:1px solid var(--line); padding:9px 14px; border-radius:8px; cursor:pointer; font-size:13px; }
+  .week-grid{ display:grid; grid-template-columns:70px repeat(5,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .week-grid > div{ background:var(--bg1); padding:8px; min-height:52px; font-size:11.5px; }
+  html[data-theme="light"] .week-grid > div{ background:var(--panel); }
+  .week-grid .dayhead{ background:rgba(128,128,128,.08); text-align:center; font-weight:700; padding:10px 4px; }
+  .week-grid .hourlabel{ color:var(--sub); text-align:right; padding-top:14px; font-size:10.5px; }
+  .visit{ background:rgba(230,179,37,.15); border:1px solid rgba(230,179,37,.5); border-radius:6px; padding:5px 6px; font-size:10.5px; margin-bottom:3px; cursor:pointer; }
+  .visit b{ display:block; font-size:11px; }
+  .visit.confirmado{ background:rgba(74,222,128,.15); border-color:rgba(74,222,128,.5); }
+  .pending-visits{ margin-bottom:18px; }
+  .pv-item{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:10px; padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .pv-item .pv-info b{ font-size:13px; } .pv-item .pv-info div{ font-size:11.5px; color:var(--sub); margin-top:2px; }
+  .empty-hint{ color:var(--sub); font-size:12.5px; padding:14px; background:var(--panel); border:1px dashed var(--line); border-radius:10px; text-align:center; }
+
+  /* ---------- Logística ---------- */
+  .logi-city{ margin-bottom:18px; }
+  .logi-city h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--sub); margin:0 0 8px; }
+  .logi-item{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:11px 14px; margin-bottom:7px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+  .logi-item b{ font-size:13px; } .logi-item div.sub2{ font-size:11.5px; color:var(--sub); margin-top:2px; }
+  .btn-map{ background:var(--site); color:#fff; border:none; font-weight:700; padding:7px 13px; border-radius:8px; cursor:pointer; font-size:12px; text-decoration:none; display:inline-block; }
+
+  /* ---------- Config ---------- */
+  .cfg-form{ max-width:560px; }
+  .cfg-form label{ display:block; font-size:11.5px; color:var(--sub); margin:14px 0 5px; font-weight:700; }
+  .cfg-form input, .cfg-form textarea{ width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:8px; padding:10px 12px; font-size:13.5px; font-family:inherit; }
+  .cfg-form textarea{ min-height:70px; resize:vertical; }
+  .cfg-saved{ display:none; margin-top:14px; padding:10px 14px; background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.4); border-radius:8px; color:#3fae6c; font-size:12.5px; }
+
+  /* ---------- IA Coach ---------- */
+  .coach-wrap{ display:flex; flex-direction:column; height:min(560px,70vh); background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; max-width:640px; }
+  .coach-body{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .coach-msg{ max-width:82%; padding:10px 13px; border-radius:13px; font-size:13px; line-height:1.45; }
+  .coach-msg.bot{ align-self:flex-start; background:var(--panel2); border:1px solid var(--line); border-bottom-left-radius:4px; }
+  .coach-msg.me{ align-self:flex-end; background:linear-gradient(135deg,var(--gold),#f6c863); color:#3a2a00; border-bottom-right-radius:4px; font-weight:600; }
+  .coach-quick{ display:flex; gap:7px; padding:0 14px 10px; flex-wrap:wrap; }
+  .coach-quick button{ background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:999px; padding:6px 12px; font-size:11.5px; cursor:pointer; }
+  .coach-input-row{ display:flex; gap:8px; padding:12px 14px; border-top:1px solid var(--line); }
+  .coach-input-row input{ flex:1; background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:10px; padding:10px 12px; font-size:13.5px; }
+  .coach-input-row button{ background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; border:none; border-radius:10px; padding:0 16px; cursor:pointer; font-weight:700; }
+
+  /* ---------- Canais ---------- */
+  .channels-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+  .channel-card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .channel-card .chead{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .ico{ width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:15px; }
+  .ico.wa{ background:var(--wa); } .ico.ig{ background:linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7); } .ico.site{ background:var(--site); }
+  .status-pill{ font-size:10.5px; padding:3px 9px; border-radius:20px; font-weight:700; }
+  .status-pill.on{ background:rgba(74,222,128,.18); color:#2f9e5b; } .status-pill.pending{ background:rgba(230,179,37,.18); color:var(--gold-deep); }
+  .channel-card p{ font-size:12px; color:var(--sub); line-height:1.5; }
+
+  /* ---------- Contact drawer ---------- */
+  #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:.25s; z-index:80; }
+  #overlay.show{ opacity:1; pointer-events:auto; }
+  #drawer{
+    position:fixed; top:0; right:0; bottom:0; width:420px; max-width:92vw; background:var(--panel);
+    box-shadow:-14px 0 40px rgba(0,0,0,.5); transform:translateX(100%); transition:.3s ease; z-index:90;
+    display:flex; flex-direction:column;
+  }
+  #drawer.open{ transform:translateX(0); }
+  #drawerHead{ padding:16px; border-bottom:1px solid var(--line); }
+  #drawerHead h3{ margin:0 0 4px; }
+  #drawerHead .sub{ color:var(--sub); font-size:12px; }
+  #drawerBody{ padding:16px; overflow-y:auto; flex:1; }
+  .field-row{ display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px dashed var(--line); }
+  .field-row span:first-child{ color:var(--sub); }
+  .timeline{ margin-top:16px; }
+  .timeline h4{ font-size:12px; text-transform:uppercase; color:var(--sub); letter-spacing:.5px; margin-bottom:10px; }
+  .tl-item{ display:flex; gap:10px; margin-bottom:12px; }
+  .tl-icon{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex:0 0 auto; }
+  .tl-icon.wa{ background:var(--wa); } .tl-icon.ig{ background:var(--ig); } .tl-icon.site{ background:var(--site); } .tl-icon.crm{ background:var(--gold); color:#3a2a00; }
+  .tl-text{ font-size:12px; line-height:1.4; }
+  .tl-time{ color:var(--sub); font-size:10.5px; margin-top:2px; }
+  #closeDrawer{ background:rgba(128,128,128,.12); border:1px solid var(--line); color:var(--txt); border-radius:6px; padding:4px 9px; cursor:pointer; float:right; }
+
+  @media (max-width:700px){
+    .week-grid{ grid-template-columns:50px repeat(5,minmax(90px,1fr)); font-size:10px; overflow-x:auto; }
+    nav{ max-width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PIN GATE — só pra deploy de demonstração (Vercel). Ver shared/pin-gate.js.
+     Precisa ser o PRIMEIRO elemento do body: trava tudo, inclusive a tela de login. -->
+<script src="/shared/pin-gate.js"></script>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="lg-brand"><span class="dot"></span> AVANTE — Painel Admin</div>
+    <div class="lg-sub">Acesso restrito à equipe Avante Distribuição</div>
+    <label for="loginVendor">Vendedor(a)</label>
+    <select id="loginVendor">
+      <option value="marcos">Marcos</option>
+      <option value="fernanda">Fernanda</option>
+      <option value="diego">Diego</option>
+      <option value="admin">Administrador</option>
+    </select>
+    <label for="loginSenha">Senha</label>
+    <input id="loginSenha" type="password" placeholder="••••">
+    <div class="err" id="loginErr">Senha incorreta, tenta de novo.</div>
+    <button id="loginBtn">Entrar</button>
+    <div class="login-note">
+      Painel de demonstração — cada vendedor(a) já tem login e senha individuais aqui, mas por enquanto a validação é local (no navegador). Quando o banco Supabase for conectado, isso vira autenticação real, com senha própria de cada um trocável a qualquer momento.
+      <br><br><b>Senha de demonstração:</b> 1234 (vendedores) · admin123 (administrador)
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="adminApp" style="display:none;">
+  <header>
+    <div class="brand"><span class="dot"></span> AVANTE Admin</div>
+    <nav>
+      <button class="tab-btn active" data-view="dashboard">Dashboard</button>
+      <button class="tab-btn" data-view="pipeline">Pipeline</button>
+      <button class="tab-btn" data-view="contatos">Clientes</button>
+      <button class="tab-btn" data-view="agenda">Agenda</button>
+      <button class="tab-btn" data-view="logistica">Logística</button>
+      <button class="tab-btn" data-view="coach">IA Coach</button>
+      <button class="tab-btn" data-view="config">Config</button>
+      <button class="tab-btn" data-view="canais">Canais</button>
+    </nav>
+    <div class="hdr-right">
+      <button class="icon-btn" id="themeToggleBtn" title="Alternar tema">🌓</button>
+      <div class="who-badge"><span class="av" id="whoAvatar">M</span><span id="whoName">Marcos</span></div>
+      <button class="btn-ghost-sm" id="logoutBtn">Sair</button>
+    </div>
+  </header>
+
+  <div class="banner-alert">
+    ⚠️ Protótipo com dados de exemplo — mostra como o painel unifica pedidos, clientes, agenda e logística num único lugar. Os pedidos de visita e clientes cadastrados abaixo já são reais (vêm do catálogo digital, salvos neste navegador); o resto (pipeline, faturamento, canais) é dado de demonstração até o banco Supabase ser conectado de verdade.
+  </div>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <h2 class="view-title">Dashboard<span class="sub">Visão geral do negócio — combina dados reais do catálogo com exemplos de vendas</span></h2>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div class="dash-grid">
+        <div class="panel-box">
+          <h4>Pedidos por semana (exemplo)</h4>
+          <canvas id="chartWeek" width="560" height="220" style="width:100%; height:auto;"></canvas>
+        </div>
+        <div class="panel-box">
+          <h4>Produtos mais pedidos (exemplo)</h4>
+          <div id="topProdList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section id="view-pipeline" class="view">
+      <h2 class="view-title">Pipeline de vendas<span class="sub">Leads e clientes por estágio, vindos de WhatsApp, Instagram e do site</span></h2>
+      <div class="kanban" id="kanban"></div>
+    </section>
+
+    <!-- CONTATOS / CLIENTES -->
+    <section id="view-contatos" class="view">
+      <h2 class="view-title">Clientes<span class="sub">Cadastro via WhatsApp com mensagem pronta, pra agilizar o primeiro contato</span></h2>
+      <div class="toolbar">
+        <input id="searchContacts" type="text" placeholder="Buscar contato, empresa, cidade...">
+        <div class="chip active" data-ch="all">Todos os canais</div>
+        <div class="chip" data-ch="wa">WhatsApp</div>
+        <div class="chip" data-ch="ig">Instagram</div>
+        <div class="chip" data-ch="site">Site / Catálogo</div>
+        <button class="btn-primary" id="newClientBtn">+ Novo cliente</button>
+      </div>
+      <div class="inline-form" id="newClientForm">
+        <div class="grid2">
+          <div><label>Nome do responsável</label><input id="ncNome" placeholder="Ex: Marcos Silva"></div>
+          <div><label>Empresa / loja</label><input id="ncEmpresa" placeholder="Ex: Mercadinho Bela Vista"></div>
+          <div><label>Cidade</label><input id="ncCidade" placeholder="Ex: Campo Limpo Paulista"></div>
+          <div><label>WhatsApp</label><input id="ncTelefone" placeholder="(11) 90000-0000"></div>
+        </div>
+        <label>Mensagem pronta pra primeira abordagem</label>
+        <textarea id="ncMsg">Olá! Aqui é da AVANTE Distribuição 👋 Temos um catálogo digital completo de produtos pra revenda — quer que eu te envie o link pra você dar uma olhada?</textarea>
+        <div class="actions">
+          <button class="btn-primary" id="ncSaveBtn">Salvar cliente</button>
+          <button class="btn-wa" id="ncWaBtn">📱 Salvar e abrir WhatsApp</button>
+          <button class="btn-ghost" id="ncCancelBtn">Cancelar</button>
+        </div>
+      </div>
+      <table class="contacts">
+        <thead><tr><th>Contato</th><th>Empresa</th><th>Cidade</th><th>Canal</th><th>Status</th><th>Consultor</th><th>Último contato</th></tr></thead>
+        <tbody id="contactsBody"></tbody>
+      </table>
+    </section>
+
+    <!-- AGENDA -->
+    <section id="view-agenda" class="view">
+      <h2 class="view-title">Agenda de visitas<span class="sub">Pedidos que os próprios clientes fazem no catálogo entram aqui, prontos pra confirmar</span></h2>
+
+      <div class="pending-visits">
+        <h4 style="font-size:12.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--sub); margin:0 0 8px;">Pedidos de visita recebidos pelo catálogo</h4>
+        <div id="pendingVisitsList"></div>
+      </div>
+
+      <div class="agenda-head">
+        <div>
+          <h3 style="margin:0 0 4px;">Semana de 18 a 22/08</h3>
+          <div style="color:var(--sub); font-size:12px;">Consultores: Marcos, Fernanda, Diego</div>
+        </div>
+        <button class="btn-primary" id="newVisitBtn">+ Novo agendamento</button>
+      </div>
+      <div class="inline-form" id="newVisitForm">
+        <div class="grid2">
+          <div><label>Cliente / empresa</label><input id="nvCliente" placeholder="Ex: Mercearia Torres"></div>
+          <div><label>Consultor</label>
+            <select id="nvConsultor"><option>Marcos</option><option>Fernanda</option><option>Diego</option></select>
+          </div>
+          <div><label>Dia</label>
+            <select id="nvDia">
+              <option value="0">Segunda 18/08</option><option value="1">Terça 19/08</option><option value="2">Quarta 20/08</option>
+              <option value="3">Quinta 21/08</option><option value="4">Sexta 22/08</option>
+            </select>
+          </div>
+          <div><label>Horário</label>
+            <select id="nvHora"><option>08h</option><option>09h</option><option>10h</option><option>11h</option><option>12h</option><option>13h</option><option>14h</option><option>15h</option><option>16h</option><option>17h</option></select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="nvSaveBtn">Agendar</button>
+          <button class="btn-ghost" id="nvCancelBtn">Cancelar</button>
+        </div>
+      </div>
+      <div class="week-grid" id="weekGrid"></div>
+    </section>
+
+    <!-- LOGÍSTICA -->
+    <section id="view-logistica" class="view">
+      <h2 class="view-title">Logística<span class="sub">Clientes agrupados por cidade, com rota pronta pro consultor abrir no mapa do celular</span></h2>
+      <div id="logiList"></div>
+    </section>
+
+    <!-- IA COACH -->
+    <section id="view-coach" class="view">
+      <h2 class="view-title">IA Coach de Vendas<span class="sub">Orientação interna pra equipe — diferente da Ana, que fala com o cliente no catálogo</span></h2>
+      <div class="coach-wrap">
+        <div class="coach-body" id="coachBody"></div>
+        <div class="coach-quick" id="coachQuick"></div>
+        <form class="coach-input-row" id="coachForm">
+          <input id="coachInput" type="text" placeholder="Pergunta pro coach... ex: cliente disse que tá caro" autocomplete="off">
+          <button type="submit">Enviar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- CONFIG -->
+    <section id="view-config" class="view">
+      <h2 class="view-title">Config do site<span class="sub">Edita direto aqui, sem mexer em código — o catálogo digital lê essas configurações na hora</span></h2>
+      <div class="cfg-form">
+        <label>Número do WhatsApp de vendas (só números, com DDI+DDD)</label>
+        <input id="cfgWhats" placeholder="Ex: 5511945460722">
+        <label>Nome da vendedora IA (chat do catálogo)</label>
+        <input id="cfgAiName" placeholder="Ex: Ana">
+        <label>Mensagem de saudação da IA no catálogo</label>
+        <textarea id="cfgGreeting" placeholder="Ex: oi, seja bem-vindo à Avante, me conta o que você precisa que eu já separo"></textarea>
+        <div class="actions" style="margin-top:16px; display:flex; gap:10px;">
+          <button class="btn-primary" id="cfgSaveBtn">Salvar configurações</button>
+        </div>
+        <div class="cfg-saved" id="cfgSavedNote">✓ Salvo! O catálogo digital já vai usar essas configurações na próxima vez que alguém abrir.</div>
+      </div>
+    </section>
+
+    <!-- CANAIS -->
+    <section id="view-canais" class="view">
+      <h2 class="view-title">Canais<span class="sub">Status da integração com cada canal de atendimento</span></h2>
+      <div class="channels-grid">
+        <div class="channel-card">
+          <div class="chead"><div class="ico wa">W</div><div><b>WhatsApp Business</b><br><span class="status-pill pending">A conectar</span></div></div>
+          <p>Recomendado: <b>WhatsApp Business Cloud API</b> (oficial, da Meta) em vez do Evolution API — risco de banimento muito menor, mesmo exigindo verificação da empresa. Bot responde catálogo, monta pedido por caixa e agenda visita de consultor. Toda conversa vira um contato/timeline aqui no painel.</p>
+        </div>
+        <div class="channel-card">
+          <div class="chead"><div class="ico ig">I</div><div><b>Instagram Direct</b><br><span class="status-pill pending">A configurar</span></div></div>
+          <p>Via Instagram Messaging API (conta comercial vinculada a uma Página do Facebook + app revisado pela Meta). Mesmo motor de bot do WhatsApp, respostas adaptadas ao formato de DM.</p>
+        </div>
+        <div class="channel-card">
+          <div class="chead"><div class="ico site">S</div><div><b>Chat do Catálogo (site)</b><br><span class="status-pill on">Ativo</span></div></div>
+          <p>A Ana já responde dentro do próprio catálogo digital, mostra produto com foto na conversa e adiciona ao orçamento automaticamente quando o cliente confirma.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="overlay"></div>
+<div id="drawer">
+  <div id="drawerHead">
+    <button id="closeDrawer">✕</button>
+    <h3 id="drawerName">—</h3>
+    <div class="sub" id="drawerSub">—</div>
+  </div>
+  <div id="drawerBody"></div>
+</div>
+
+<script>
+// ============ AUTENTICAÇÃO (mock local — trocar por Supabase Auth quando conectado) ============
+const VENDORS = {
+  marcos:   { nome:'Marcos',   senha:'1234',     tipo:'vendedor' },
+  fernanda: { nome:'Fernanda', senha:'1234',     tipo:'vendedor' },
+  diego:    { nome:'Diego',    senha:'1234',     tipo:'vendedor' },
+  admin:    { nome:'Administrador', senha:'admin123', tipo:'admin' },
+};
+
+function showApp(session){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  document.getElementById('whoName').textContent = session.nome;
+  document.getElementById('whoAvatar').textContent = session.nome.charAt(0).toUpperCase();
+  initAppData();
+}
+
+function checkSession(){
+  // chamada só no fim do script (ver initAppData() lá embaixo) — se rodasse aqui em cima,
+  // showApp()->initAppData() tentaria usar CONTACTS/VISITS/STAGES antes de essas variáveis
+  // `let`/`const` serem inicializadas mais abaixo no arquivo (erro de temporal dead zone),
+  // e como isso ficava dentro de um try/catch, o erro era engolido em silêncio — a tela
+  // aparecia certa, mas a tabela/kanban/agenda ficavam vazios até a primeira ação manual.
+  try{
+    const raw = localStorage.getItem('avante_admin_session');
+    if(raw){ showApp(JSON.parse(raw)); }
+  }catch(e){ console.error('[admin] falha ao restaurar sessão', e); }
+}
+
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const id = document.getElementById('loginVendor').value;
+  const senha = document.getElementById('loginSenha').value;
+  const v = VENDORS[id];
+  const errEl = document.getElementById('loginErr');
+  if(v && v.senha === senha){
+    errEl.style.display = 'none';
+    const session = { id, nome:v.nome, tipo:v.tipo, entrouEm:new Date().toISOString() };
+    try{ localStorage.setItem('avante_admin_session', JSON.stringify(session)); }catch(e){}
+    showApp(session);
+  } else {
+    errEl.style.display = 'block';
+  }
+});
+document.getElementById('loginSenha').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  try{ localStorage.removeItem('avante_admin_session'); }catch(e){}
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginSenha').value = '';
+});
+
+// ============ TEMA CLARO/ESCURO ============
+document.getElementById('themeToggleBtn').addEventListener('click', ()=>{
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  if(isLight){ document.documentElement.removeAttribute('data-theme'); try{ localStorage.setItem('avante_admin_theme','dark'); }catch(e){} }
+  else{ document.documentElement.setAttribute('data-theme','light'); try{ localStorage.setItem('avante_admin_theme','light'); }catch(e){} }
+});
+
+// ============ DADOS (exemplo) ============
+let CONTACTS = [
+  { id:1, nome:'Marcos Silva', empresa:'Mercadinho Bela Vista', cidade:'Campo Limpo Paulista', telefone:'11999998888', canal:'wa', status:'lead', estagio:'Em conversa',
+    consultor:'Fernanda', ultimo:'hoje 09:12',
+    timeline:[
+      {canal:'wa', texto:'Cliente: "Vocês têm a linha My Bit disponível pra pronta entrega?"', hora:'hoje 09:12'},
+      {canal:'crm', texto:'Bot identificou interesse em Biscoitos & Bolachas e sugeriu catálogo rápido', hora:'hoje 09:12'},
+      {canal:'wa', texto:'Bot: enviou 6 produtos da linha My Bit com preço de caixa fechada', hora:'hoje 09:13'},
+    ]},
+  { id:2, nome:'Studio Doce & Cia', empresa:'Doce & Cia Confeitaria', cidade:'Jundiaí', telefone:'11988887777', canal:'ig', status:'lead', estagio:'Novo lead',
+    consultor:'—', ultimo:'ontem 18:40',
+    timeline:[
+      {canal:'ig', texto:'Cliente comentou no post do Reels perguntando sobre coco ralado', hora:'ontem 18:38'},
+      {canal:'ig', texto:'Bot: respondeu no direct com a linha Coco & Cia completa', hora:'ontem 18:40'},
+    ]},
+  { id:3, nome:'Ana Torres', empresa:'Mercearia Torres', cidade:'Várzea Paulista', telefone:'11977776666', canal:'site', status:'ativo', estagio:'Visita agendada',
+    consultor:'Marcos', ultimo:'seg 14:02',
+    timeline:[
+      {canal:'site', texto:'Abriu o Catálogo Rápido, filtrou "Temperos & Molhos"', hora:'seg 13:55'},
+      {canal:'site', texto:'Clicou em "falar com consultor" no card de Sal de Parrilla', hora:'seg 14:00'},
+      {canal:'crm', texto:'Visita agendada automaticamente para qui 21/08 às 10h com Marcos', hora:'seg 14:02'},
+    ]},
+  { id:4, nome:'Roberto Nunes', empresa:'Empório Nunes', cidade:'Campo Limpo Paulista', telefone:'11966665555', canal:'wa', status:'ativo', estagio:'Cliente ativo',
+    consultor:'Diego', ultimo:'sex 11:20',
+    timeline:[
+      {canal:'wa', texto:'Pedido fechado: 12 caixas mix Bel + Diatt', hora:'sex 11:18'},
+      {canal:'crm', texto:'Pedido confirmado no painel interno, nota gerada', hora:'sex 11:20'},
+    ]},
+  { id:5, nome:'Padaria Pão Quente', empresa:'Pão Quente Ltda', cidade:'Jarinu', telefone:'11955554444', canal:'ig', status:'perdido', estagio:'Perdido',
+    consultor:'Fernanda', ultimo:'12/08',
+    timeline:[
+      {canal:'ig', texto:'Perguntou preço da linha Kobber, não retornou após orçamento', hora:'12/08'},
+    ]},
+  { id:6, nome:'Casa do Salgado', empresa:'Casa do Salgado MEI', cidade:'Campo Limpo Paulista', telefone:'11944443333', canal:'site', status:'lead', estagio:'Proposta enviada',
+    consultor:'Diego', ultimo:'qua 16:10',
+    timeline:[
+      {canal:'site', texto:'Baixou a revista digital completa pelo link compartilhado', hora:'qua 15:50'},
+      {canal:'crm', texto:'Diego enviou proposta com 8 itens de salgadinhos e temperos', hora:'qua 16:10'},
+    ]},
+];
+const STAGES = ['Novo lead','Em conversa','Proposta enviada','Visita agendada','Cliente ativo','Perdido'];
+const CH_LABEL = {wa:'WhatsApp', ig:'Instagram', site:'Site'};
+const CH_ICON = {wa:'📱', ig:'📷', site:'🌐'};
+
+const DAYS = ['Seg 18/08','Ter 19/08','Qua 20/08','Qui 21/08','Sex 22/08'];
+const HOURS = ['08h','09h','10h','11h','12h','13h','14h','15h','16h','17h'];
+let VISITS = [
+  {day:0, hour:'09h', cliente:'Mercadinho Bela Vista', consultor:'Fernanda', status:'pendente'},
+  {day:1, hour:'14h', cliente:'Empório Nunes', consultor:'Diego', status:'confirmado'},
+  {day:3, hour:'10h', cliente:'Mercearia Torres', consultor:'Marcos', status:'confirmado'},
+  {day:4, hour:'11h', cliente:'Casa do Salgado MEI', consultor:'Diego', status:'pendente'},
+];
+
+function channelBadge(c){ return `<span class="badge ${c}">${CH_ICON[c]} ${CH_LABEL[c]}</span>`; }
+
+// ============ DASHBOARD ============
+function buildDashboard(){
+  const pendentes = getVisitRequests().length;
+  const kpis = [
+    { label:'Pedidos de visita pendentes', value:pendentes, delta: pendentes>0 ? `${pendentes} aguardando confirmação` : 'nenhum no momento', cls: pendentes>0?'up':'flat' },
+    { label:'Clientes cadastrados', value:CONTACTS.length, delta:'+2 essa semana (exemplo)', cls:'up' },
+    { label:'Visitas agendadas (semana)', value:VISITS.length, delta:'2 confirmadas, 2 pendentes', cls:'flat' },
+    { label:'Faturamento estimado do mês', value:'R$ 48.200', delta:'exemplo — liga o Supabase pra ver de verdade', cls:'flat' },
+  ];
+  const grid = document.getElementById('kpiGrid');
+  grid.innerHTML = kpis.map((k,i)=>`
+    <div class="kpi-card" style="--kpi-delay:${i*60}ms">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value" data-final="${k.value}">${/^\d+$/.test(String(k.value)) ? 0 : k.value}</div>
+      <div class="kpi-delta ${k.cls}">${k.delta}</div>
+    </div>`).join('');
+
+  // contagem animada só nos KPIs puramente numéricos (não mexe em "R$ 48.200" etc.)
+  grid.querySelectorAll('.kpi-value[data-final]').forEach(el=>{
+    const final = el.dataset.final;
+    if(!/^\d+$/.test(final)) return;
+    const target = parseInt(final, 10);
+    if(target === 0) return;
+    const dur = 600, start = performance.now();
+    function step(now){
+      const p = Math.min(1, (now-start)/dur);
+      const eased = 1 - Math.pow(1-p, 3);
+      el.textContent = Math.round(eased * target);
+      if(p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+
+  // gráfico simples de barras (sem depender de biblioteca externa), com as barras
+  // "crescendo" na entrada em vez de aparecerem prontas de uma vez
+  const canvas = document.getElementById('chartWeek');
+  const ctx = canvas.getContext('2d');
+  const data = [12, 19, 14, 22, 27, 18, 9];
+  const labels = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const max = Math.max(...data);
+  const barW = canvas.width / data.length;
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const TOP_MARGIN = 22; // espaço reservado pro número não cortar no topo da barra mais alta
+  const BOTTOM_MARGIN = 20;
+  function drawBars(progress){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    data.forEach((v,i)=>{
+      const h = (v/max) * (canvas.height - TOP_MARGIN - BOTTOM_MARGIN) * progress;
+      const x = i*barW + barW*0.22;
+      const w = barW*0.56;
+      const y = canvas.height - h - BOTTOM_MARGIN;
+      const grad = ctx.createLinearGradient(0,y,0,y+h);
+      grad.addColorStop(0,'#e6b325'); grad.addColorStop(1,'#c6890f');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x,y,w,Math.max(h,0),4) : ctx.rect(x,y,w,Math.max(h,0));
+      ctx.fill();
+      ctx.fillStyle = isLight ? '#7A6A57' : '#9fb0c8';
+      ctx.font = '11px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x+w/2, canvas.height-6);
+      if(progress > 0.6){
+        ctx.fillStyle = isLight ? '#2B2118' : '#eef2f8';
+        ctx.fillText(v, x+w/2, y-6);
+      }
+    });
+  }
+  const chartDur = 550, chartStart = performance.now();
+  function chartStep(now){
+    const p = Math.min(1, (now-chartStart)/chartDur);
+    drawBars(1 - Math.pow(1-p, 3));
+    if(p < 1) requestAnimationFrame(chartStep);
+  }
+  requestAnimationFrame(chartStep);
+
+  const topProducts = [
+    { nome:'Biscoito Laminado Água e Sal Casaredo', pct:100 },
+    { nome:'Wafer Yupi Chocolate', pct:82 },
+    { nome:'Bala de Banana Oliveira', pct:71 },
+    { nome:'Rosca Coco Casaredo', pct:58 },
+    { nome:'Doce de Frutas Morango', pct:44 },
+  ];
+  document.getElementById('topProdList').innerHTML = topProducts.map(p=>`
+    <div class="top-prod">
+      <span>${p.nome}</span>
+    </div>
+    <div class="tp-bar" style="width:${p.pct}%;"></div>
+  `).join('');
+}
+
+// ============ PIPELINE ============
+function buildKanban(){
+  const kanban = document.getElementById('kanban');
+  kanban.innerHTML = '';
+  STAGES.forEach(stage=>{
+    const items = CONTACTS.filter(c=>c.estagio===stage);
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.innerHTML = `<h4>${stage} <span class="count">${items.length}</span></h4>`;
+    items.forEach(c=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      const last = c.timeline.length ? c.timeline[c.timeline.length-1].texto : 'Cliente cadastrado pelo painel admin';
+      card.innerHTML = `
+        <div class="top"><span class="name">${c.nome}</span>${channelBadge(c.canal)}</div>
+        <div class="snippet">${last}</div>
+        <div class="meta"><span class="consultor-chip">👤 ${c.consultor}</span><span>${c.ultimo}</span></div>`;
+      card.addEventListener('click', ()=>openDrawer(c.id));
+      col.appendChild(card);
+    });
+    kanban.appendChild(col);
+  });
+}
+
+// ============ CONTATOS ============
+function buildContacts(filterCh='all', query=''){
+  const body = document.getElementById('contactsBody');
+  body.innerHTML = '';
+  const q = query.trim().toLowerCase();
+  CONTACTS.filter(c=>{
+    if(filterCh!=='all' && c.canal!==filterCh) return false;
+    if(q && !(c.nome+c.empresa+c.cidade).toLowerCase().includes(q)) return false;
+    return true;
+  }).forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${c.nome}</b></td>
+      <td>${c.empresa}</td>
+      <td>${c.cidade}</td>
+      <td>${channelBadge(c.canal)}</td>
+      <td><span class="dot-status ${c.status}"></span>${c.estagio}</td>
+      <td>${c.consultor}</td>
+      <td>${c.ultimo}</td>`;
+    tr.addEventListener('click', ()=>openDrawer(c.id));
+    body.appendChild(tr);
+  });
+}
+
+function openDrawer(id){
+  const c = CONTACTS.find(x=>x.id===id);
+  document.getElementById('drawerName').textContent = c.nome;
+  document.getElementById('drawerSub').textContent = `${c.empresa} · ${c.cidade}`;
+  const body = document.getElementById('drawerBody');
+  const waLink = c.telefone ? `https://wa.me/55${c.telefone.replace(/\D/g,'').replace(/^55/,'')}` : '#';
+  body.innerHTML = `
+    <div class="field-row"><span>Canal de origem</span><span>${CH_LABEL[c.canal]}</span></div>
+    <div class="field-row"><span>Status</span><span>${c.estagio}</span></div>
+    <div class="field-row"><span>Consultor responsável</span><span>${c.consultor}</span></div>
+    <div class="field-row"><span>Telefone</span><span>${c.telefone||'—'}</span></div>
+    <div class="field-row"><span>Último contato</span><span>${c.ultimo}</span></div>
+    ${c.telefone ? `<a class="btn-wa" style="margin-top:12px;" href="${waLink}" target="_blank">📱 Abrir WhatsApp</a>` : ''}
+    <div class="timeline">
+      <h4>Linha do tempo (todos os canais)</h4>
+      ${c.timeline.map(t=>`
+        <div class="tl-item">
+          <div class="tl-icon ${t.canal}">${t.canal==='crm'?'⚙':CH_ICON[t.canal]}</div>
+          <div class="tl-text">${t.texto}<div class="tl-time">${t.hora}</div></div>
+        </div>`).join('')}
+    </div>
+  `;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+document.getElementById('overlay').addEventListener('click', closeDrawer);
+
+// novo cliente (cadastro via WhatsApp com mensagem pronta)
+document.getElementById('newClientBtn').addEventListener('click', ()=>{
+  document.getElementById('newClientForm').classList.toggle('show');
+});
+document.getElementById('ncCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('newClientForm').classList.remove('show');
+});
+function saveNewClient(){
+  const nome = document.getElementById('ncNome').value.trim();
+  const empresa = document.getElementById('ncEmpresa').value.trim();
+  const cidade = document.getElementById('ncCidade').value.trim();
+  const telefone = document.getElementById('ncTelefone').value.trim();
+  if(!nome || !empresa || !telefone){ return null; }
+  const novo = {
+    id: Math.max(0,...CONTACTS.map(c=>c.id)) + 1,
+    nome, empresa, cidade, telefone, canal:'wa', status:'lead', estagio:'Novo lead', consultor:'—',
+    ultimo:'agora', timeline:[{canal:'crm', texto:'Cliente cadastrado manualmente pelo painel admin', hora:'agora'}]
+  };
+  CONTACTS.push(novo);
+  buildContacts(); buildKanban(); buildDashboard(); buildLogistica();
+  return novo;
+}
+document.getElementById('ncSaveBtn').addEventListener('click', ()=>{
+  const novo = saveNewClient();
+  if(novo){ document.getElementById('newClientForm').classList.remove('show'); }
+});
+document.getElementById('ncWaBtn').addEventListener('click', ()=>{
+  const telefone = document.getElementById('ncTelefone').value.trim();
+  const msg = document.getElementById('ncMsg').value.trim();
+  const novo = saveNewClient();
+  if(novo && telefone){
+    const url = `https://wa.me/55${telefone.replace(/\D/g,'').replace(/^55/,'')}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+    document.getElementById('newClientForm').classList.remove('show');
+  }
+});
+
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    buildContacts(chip.dataset.ch, document.getElementById('searchContacts').value);
+  });
+});
+document.getElementById('searchContacts').addEventListener('input', (e)=>{
+  const active = document.querySelector('.chip.active').dataset.ch;
+  buildContacts(active, e.target.value);
+});
+
+// ============ AGENDA ============
+function getVisitRequests(){
+  try{ return JSON.parse(localStorage.getItem('avante_visit_requests') || '[]'); }catch(e){ return []; }
+}
+function saveVisitRequests(list){
+  try{ localStorage.setItem('avante_visit_requests', JSON.stringify(list)); }catch(e){}
+}
+function buildPendingVisits(){
+  const list = getVisitRequests();
+  const wrap = document.getElementById('pendingVisitsList');
+  const pendentes = list.filter(v=>v.status==='pendente');
+  if(!pendentes.length){
+    wrap.innerHTML = '<div class="empty-hint">Nenhum pedido de visita novo — quando um cliente pedir pelo catálogo digital, aparece aqui.</div>';
+    return;
+  }
+  wrap.innerHTML = pendentes.map((v,idx)=>`
+    <div class="pv-item">
+      <div class="pv-info">
+        <b>${v.nome} · ${v.empresa}</b>
+        <div>${v.cidade} · ${v.telefone} · prefere ${v.dia}-feira</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <a class="btn-wa" href="https://wa.me/55${(v.telefone||'').replace(/\D/g,'').replace(/^55/,'')}" target="_blank">📱 Chamar</a>
+        <button class="btn-primary" data-idx="${idx}" data-action="confirmar-visita">Agendar</button>
+      </div>
+    </div>`).join('');
+  wrap.querySelectorAll('[data-action="confirmar-visita"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const all = getVisitRequests();
+      const pend = all.filter(v=>v.status==='pendente');
+      const item = pend[parseInt(btn.dataset.idx,10)];
+      item.status = 'confirmado';
+      saveVisitRequests(all);
+      VISITS.push({ day:0, hour:'09h', cliente:item.empresa, consultor:'Marcos', status:'pendente' });
+      buildPendingVisits(); buildAgenda(); buildDashboard();
+    });
+  });
+}
+function buildAgenda(){
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  grid.appendChild(Object.assign(document.createElement('div'), {className:'dayhead', textContent:''}));
+  DAYS.forEach(d=> grid.appendChild(Object.assign(document.createElement('div'), {className:'dayhead', textContent:d})) );
+  HOURS.forEach((h)=>{
+    grid.appendChild(Object.assign(document.createElement('div'), {className:'hourlabel', textContent:h}));
+    DAYS.forEach((d, di)=>{
+      const cell = document.createElement('div');
+      const vs = VISITS.filter(v=>v.day===di && v.hour===h);
+      cell.innerHTML = vs.map(v=>`<div class="visit ${v.status}"><b>${v.cliente}</b>${v.consultor} · ${v.status}</div>`).join('');
+      grid.appendChild(cell);
+    });
+  });
+}
+document.getElementById('newVisitBtn').addEventListener('click', ()=>{
+  document.getElementById('newVisitForm').classList.toggle('show');
+});
+document.getElementById('nvCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('newVisitForm').classList.remove('show');
+});
+document.getElementById('nvSaveBtn').addEventListener('click', ()=>{
+  const cliente = document.getElementById('nvCliente').value.trim();
+  if(!cliente) return;
+  VISITS.push({
+    day: parseInt(document.getElementById('nvDia').value,10),
+    hour: document.getElementById('nvHora').value,
+    cliente,
+    consultor: document.getElementById('nvConsultor').value,
+    status: 'confirmado'
+  });
+  buildAgenda(); buildDashboard();
+  document.getElementById('newVisitForm').classList.remove('show');
+  document.getElementById('nvCliente').value = '';
+});
+
+// ============ LOGÍSTICA ============
+function buildLogistica(){
+  const byCity = {};
+  CONTACTS.forEach(c=>{
+    if(!c.cidade) return;
+    (byCity[c.cidade] = byCity[c.cidade] || []).push(c);
+  });
+  const wrap = document.getElementById('logiList');
+  wrap.innerHTML = Object.keys(byCity).sort().map(cidade=>{
+    const items = byCity[cidade];
+    const mapsAll = 'https://www.google.com/maps/dir/' + items.map(i=>encodeURIComponent(i.empresa+', '+cidade)).join('/');
+    return `
+      <div class="logi-city">
+        <h4>${cidade} — ${items.length} cliente(s) <a class="btn-map" style="margin-left:8px;" href="${mapsAll}" target="_blank">🗺 Ver rota do dia</a></h4>
+        ${items.map(i=>`
+          <div class="logi-item">
+            <div><b>${i.empresa}</b><div class="sub2">${i.nome} · ${CH_LABEL[i.canal]} · consultor: ${i.consultor}</div></div>
+            <a class="btn-map" href="https://www.google.com/maps/search/${encodeURIComponent(i.empresa+', '+cidade)}" target="_blank">🗺 Ver no mapa</a>
+          </div>`).join('')}
+      </div>`;
+  }).join('') || '<div class="empty-hint">Nenhum cliente com cidade cadastrada ainda.</div>';
+}
+
+// ============ IA COACH ============
+const COACH_TOPICS = {
+  'cliente disse que ta caro': 'mostra o valor da caixa fechada, não da unidade — o preço por unidade quase sempre fica menor que o concorrente. e lembra ele que a entrega já tá inclusa',
+  'cliente sumiu': 'manda um whatsapp simples tipo "oi, ainda tá pensando no pedido? separei as caixas aqui, é só confirmar" — sem cobrar, só lembrando que você tá disponível',
+  'como fechar uma visita': 'oferece dois horários fixos em vez de perguntar "quando você pode" — as pessoas decidem mais rápido escolhendo entre opções',
+  'produto em falta': 'sempre oferece um similar antes de dizer "não tem" — segura a venda enquanto o estoque não repõe',
+  'primeiro contato': 'apresenta a Avante em 1 frase, manda o link do catálogo digital, e já pergunta que tipo de produto o mercado dele mais vende — isso direciona a conversa toda'
+};
+function coachAddMsg(role, text){
+  const body = document.getElementById('coachBody');
+  const div = document.createElement('div');
+  div.className = 'coach-msg ' + (role==='me' ? 'me' : 'bot');
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function coachNormalize(s){ return (s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').trim(); }
+function coachReply(text){
+  const q = coachNormalize(text);
+  let best = null, bestScore = 0;
+  Object.keys(COACH_TOPICS).forEach(k=>{
+    const words = coachNormalize(k).split(' ');
+    const score = words.filter(w=>q.includes(w)).length;
+    if(score > bestScore){ bestScore = score; best = k; }
+  });
+  if(best && bestScore >= 2) return COACH_TOPICS[best];
+  return 'boa pergunta — por enquanto eu ainda sou um coach simples, de regras fixas. me pergunta sobre: cliente achou caro, cliente sumiu, como fechar visita, produto em falta, ou primeiro contato';
+}
+document.getElementById('coachForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const input = document.getElementById('coachInput');
+  const text = input.value.trim();
+  if(!text) return;
+  coachAddMsg('me', text);
+  input.value = '';
+  setTimeout(()=>coachAddMsg('bot', coachReply(text)), 400);
+});
+function buildCoachQuick(){
+  const quick = document.getElementById('coachQuick');
+  quick.innerHTML = '';
+  Object.keys(COACH_TOPICS).forEach(k=>{
+    const btn = document.createElement('button');
+    btn.textContent = k;
+    btn.addEventListener('click', ()=>{
+      coachAddMsg('me', k);
+      setTimeout(()=>coachAddMsg('bot', COACH_TOPICS[k]), 350);
+    });
+    quick.appendChild(btn);
+  });
+}
+let coachStarted = false;
+function startCoachIfNeeded(){
+  if(coachStarted) return;
+  coachStarted = true;
+  coachAddMsg('bot', 'oi! eu sou o coach interno da Avante — te ajudo com dica rápida de venda, contorno de objeção e como fechar visita. pode perguntar');
+  buildCoachQuick();
+}
+
+// ============ CONFIG DO SITE ============
+function loadCfgForm(){
+  let cfg = {};
+  try{ cfg = JSON.parse(localStorage.getItem('avante_site_cfg')||'{}'); }catch(e){}
+  document.getElementById('cfgWhats').value = cfg.whatsapp || '5511945460722';
+  document.getElementById('cfgAiName').value = cfg.aiName || 'Ana';
+  document.getElementById('cfgGreeting').value = cfg.greeting || 'oi, seja bem-vindo à Avante, me conta o que você precisa que eu já separo';
+}
+document.getElementById('cfgSaveBtn').addEventListener('click', ()=>{
+  const cfg = {
+    whatsapp: document.getElementById('cfgWhats').value.replace(/\D/g,''),
+    aiName: document.getElementById('cfgAiName').value.trim(),
+    greeting: document.getElementById('cfgGreeting').value.trim(),
+  };
+  try{ localStorage.setItem('avante_site_cfg', JSON.stringify(cfg)); }catch(e){}
+  const note = document.getElementById('cfgSavedNote');
+  note.style.display = 'block';
+  setTimeout(()=>{ note.style.display = 'none'; }, 3500);
+});
+
+// ============ NAVEGAÇÃO (abas) ============
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    if(btn.dataset.view === 'coach') startCoachIfNeeded();
+    if(btn.dataset.view === 'dashboard') buildDashboard();
+    // pedidos de visita e clientes podem ter mudado em outra aba (o cliente pedindo visita
+    // pelo catálogo, por exemplo) — recarrega toda vez que o vendedor abre essas abas, em
+    // vez de confiar só no snapshot de quando fez login.
+    if(btn.dataset.view === 'agenda'){ buildPendingVisits(); buildAgenda(); }
+    if(btn.dataset.view === 'contatos') buildContacts();
+    if(btn.dataset.view === 'logistica') buildLogistica();
+  });
+});
+
+// ============ INIT (só depois do login) ============
+function initAppData(){
+  buildDashboard();
+  buildKanban();
+  buildContacts();
+  buildPendingVisits();
+  buildAgenda();
+  buildLogistica();
+  loadCfgForm();
+}
+
+// só agora, com todas as funções e dados (CONTACTS, VISITS, STAGES...) já inicializados,
+// é seguro checar se já tinha uma sessão salva e pular direto pro painel.
+checkSession();
+</script>
+</body>
+</html>

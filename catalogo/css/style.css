@@ -1,0 +1,677 @@
+:root{
+  --cream:#FFF8EC;
+  --cream2:#FFEFD6;
+  --paper:#FFFDF9;
+  --navy:#0B2A52;
+  --navy2:#123B70;
+  --gold:#E8AE30;
+  --gold-deep:#C6890F;
+  --red:#D63A2E;
+  --orange:#F2994A;
+  --ink:#2B2118;
+  --sub:#7A6A57;
+  --line:rgba(43,33,24,.10);
+  --line-strong:rgba(43,33,24,.16);
+  --radius:14px;
+  --radius-lg:20px;
+  --font-display:'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body:'Plus Jakarta Sans', 'Segoe UI', system-ui, Arial, sans-serif;
+  /* sombras em camadas (uma bem próxima e sutil + uma difusa mais longa) — dá a sensação
+     de profundidade "premium" em vez de uma sombra única e achatada. */
+  --shadow-sm:0 1px 2px rgba(43,33,24,.06), 0 2px 6px rgba(43,33,24,.05);
+  --shadow-md:0 2px 6px rgba(43,33,24,.07), 0 10px 24px rgba(43,33,24,.10);
+  --shadow-lg:0 8px 20px rgba(43,33,24,.12), 0 24px 56px rgba(43,33,24,.16);
+  --shadow-gold:0 10px 24px rgba(198,137,15,.32);
+  --shadow-red:0 10px 24px rgba(214,58,46,.32);
+  --ease:cubic-bezier(.22,.61,.32,1);
+  /* texto que normalmente usa a navy da marca (títulos, ícones, labels) — no escuro
+     essa mesma navy fica ilegível em cima de fundo escuro, então isolamos numa
+     variável própria pra poder trocar só o uso "texto" sem mexer nos botões que
+     usam navy como fundo/gradiente (esses continuam ótimos no escuro). */
+  --text-navy:var(--navy);
+}
+
+/* ---------- Tema escuro ---------- */
+html[data-theme="dark"]{
+  --cream:#141B24;
+  --cream2:#1C2531;
+  --paper:#1A222D;
+  --ink:#EDE8DC;
+  --sub:#9AA6B6;
+  --line:rgba(255,255,255,.09);
+  --line-strong:rgba(255,255,255,.16);
+  --text-navy:#8FBCEE;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.24);
+  --shadow-md:0 2px 6px rgba(0,0,0,.32), 0 10px 24px rgba(0,0,0,.38);
+  --shadow-lg:0 8px 20px rgba(0,0,0,.4), 0 24px 56px rgba(0,0,0,.5);
+}
+html[data-theme="dark"] body{
+  background:
+    radial-gradient(1200px 650px at 12% -8%, rgba(232,174,48,.08) 0%, transparent 58%),
+    radial-gradient(950px 560px at 102% 4%, rgba(18,59,112,.35) 0%, transparent 52%),
+    linear-gradient(165deg, #10161E 0%, #141B24 46%, #171F2A 100%);
+}
+html[data-theme="dark"] header{
+  background:rgba(20,27,36,.86);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 6px 18px rgba(0,0,0,.3);
+}
+html[data-theme="dark"] #book{
+  filter:brightness(.93) contrast(1.03);
+}
+html[data-theme="dark"] .leaf .back{
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 2px, transparent 2px 4px),
+    #1C2531;
+}
+html[data-theme="dark"] .leaf .back .wm{ color:rgba(143,188,238,.14); }
+html[data-theme="dark"] .skel{
+  background:linear-gradient(100deg, #1C2531 8%, #232E3D 18%, #1C2531 33%);
+  background-size:200% 100%;
+}
+html[data-theme="dark"] .toolbar input,
+html[data-theme="dark"] #leadForm input,
+html[data-theme="dark"] #searchTop{ background:var(--paper); color:var(--ink); }
+html[data-theme="dark"] .chip.active,
+html[data-theme="dark"] nav.mode-toggle button.active{ color:#241a00; }
+html[data-theme="dark"] ::selection{ background:rgba(232,174,48,.35); }
+html[data-theme="dark"] #themeBtn .ico-sun{ display:none; }
+html[data-theme="dark"] #themeBtn .ico-moon{ display:inline-flex; }
+#themeBtn .ico-moon{ display:none; }
+*{box-sizing:border-box;}
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.5;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  background:
+    radial-gradient(1200px 650px at 12% -8%, #FFEFD1 0%, transparent 58%),
+    radial-gradient(950px 560px at 102% 4%, #FFDCC0 0%, transparent 52%),
+    radial-gradient(1000px 700px at 50% 115%, #F3D9AE 0%, transparent 60%),
+    linear-gradient(165deg, #FFF6E6 0%, #FCEDD3 46%, #F6E1B8 100%);
+  min-height:100%;
+  overflow-x:hidden;
+}
+a{ color:inherit; }
+button{ font-family:inherit; }
+img{ -webkit-user-drag:none; user-select:none; }
+h1,h2,h3,h4{ font-family:var(--font-display); margin:0; letter-spacing:-.01em; }
+:focus-visible{ outline:2px solid var(--gold-deep); outline-offset:2px; border-radius:4px; }
+
+/* respeita usuários que preferem menos animação */
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
+}
+
+/* ---------- Header ---------- */
+header{
+  position:sticky; top:0; z-index:60;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; padding:13px 20px;
+  background:rgba(255,253,249,.9); backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 6px 18px rgba(43,33,24,.04);
+  flex-wrap:wrap;
+}
+.brand{ display:flex; align-items:center; gap:11px; }
+.brand-logo{ display:block; height:30px; width:auto; flex:0 0 auto; }
+.brand-sub{
+  font-family:var(--font-body); font-weight:600; color:var(--sub); font-size:10.5px; letter-spacing:.6px;
+  text-transform:uppercase; white-space:nowrap; align-self:center;
+  padding-left:11px; border-left:1px solid var(--line-strong);
+}
+/* a logo real é azul-marinho escuro — no tema escuro o header também fica escuro,
+   então recebe uma "placa" clara atrás pra não sumir. A imagem em si nunca é alterada. */
+html[data-theme="dark"] .brand-logo{
+  background:rgba(255,255,255,.94); padding:5px 9px; border-radius:8px;
+}
+
+/* ===== menu hamburguer discreto (canto superior esquerdo) ===== */
+.menu-btn{
+  flex:0 0 auto; width:36px; height:36px; border-radius:10px; border:none;
+  background:transparent; color:var(--text-navy); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; opacity:.6; transition:opacity .15s var(--ease), background .15s var(--ease);
+}
+.menu-btn:hover, .menu-btn:focus-visible{ opacity:1; background:rgba(11,42,82,.06); }
+html[data-theme="dark"] .menu-btn:hover, html[data-theme="dark"] .menu-btn:focus-visible{ background:rgba(255,255,255,.08); }
+
+#navScrim{
+  position:fixed; inset:0; z-index:400; background:rgba(11,42,82,.35);
+  opacity:0; pointer-events:none; transition:opacity .22s var(--ease);
+}
+#navScrim.open{ opacity:1; pointer-events:auto; }
+#navDrawer{
+  position:fixed; top:0; left:0; bottom:0; z-index:401; width:min(280px,84vw);
+  background:var(--paper); box-shadow:6px 0 30px rgba(11,42,82,.22);
+  transform:translateX(-100%); transition:transform .26s var(--ease);
+  display:flex; flex-direction:column; padding:22px 18px;
+}
+#navDrawer.open{ transform:translateX(0); }
+#navDrawer .nd-title{
+  font-family:var(--font-display); font-weight:700; font-size:17px; color:var(--text-navy); margin-bottom:2px;
+}
+#navDrawer .nd-sub{ font-size:11.5px; color:var(--sub); margin-bottom:20px; }
+#navDrawer a{
+  display:flex; align-items:center; gap:10px; padding:12px 10px; border-radius:10px;
+  color:var(--text-navy); text-decoration:none; font-weight:600; font-size:14px;
+  font-family:var(--font-body); transition:background .15s var(--ease);
+}
+#navDrawer a:hover{ background:var(--cream2); }
+#navDrawer .nd-close{
+  position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:9px; border:none;
+  background:transparent; color:var(--sub); display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+
+nav.mode-toggle{ display:flex; gap:4px; background:var(--cream2); border-radius:13px; padding:4px; }
+nav.mode-toggle button{
+  border:none; background:transparent; color:var(--text-navy); padding:9px 16px; border-radius:10px;
+  font-size:13px; font-weight:700; cursor:pointer; font-family:var(--font-body); letter-spacing:.1px;
+  display:flex; align-items:center; gap:7px; transition:background .18s var(--ease), color .18s var(--ease), box-shadow .18s var(--ease);
+}
+nav.mode-toggle button svg{ opacity:.75; transition:opacity .18s var(--ease); flex:0 0 auto; }
+nav.mode-toggle button.active{ background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; box-shadow:var(--shadow-gold); }
+nav.mode-toggle button.active svg{ opacity:1; }
+nav.mode-toggle button:not(.active):hover{ background:rgba(255,255,255,.6); }
+
+.header-actions{ display:flex; align-items:center; gap:8px; }
+.icon-btn{
+  width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:var(--paper);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:var(--text-navy);
+  position:relative; box-shadow:var(--shadow-sm); transition:transform .16s var(--ease), box-shadow .16s var(--ease);
+}
+.icon-btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow-md); }
+.icon-btn:active{ transform:translateY(0) scale(.94); }
+.icon-btn .count{
+  position:absolute; top:-6px; right:-6px; background:var(--red); color:#fff; font-size:10px; font-weight:800;
+  min-width:17px; height:17px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 3px;
+}
+#searchTop{
+  background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:11px; padding:10px 13px;
+  font-size:13px; width:180px; font-family:var(--font-body); transition:border-color .16s, box-shadow .16s;
+}
+#searchTop:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.18); outline:none; }
+
+/* ---------- Views ---------- */
+/* troca de modo (Revista <-> Catálogo Rápido) com um crossfade suave em vez de um corte seco
+   — um corte instantâneo de tela cheia é exatamente o que faz o site parecer "slide trocando",
+   em vez de um app. .leaving/.entering são controladas por switchMode() no JS. */
+.view{ display:none; }
+.view.active{ display:block; }
+.view.leaving{ display:block; animation:viewOut .22s var(--ease) forwards; }
+.view.entering{ animation:viewIn .34s var(--ease); }
+@keyframes viewOut{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px) scale(.985); } }
+@keyframes viewIn{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
+main{ max-width:1400px; margin:0 auto; }
+
+/* o app inteiro "acorda" com um fade suave no primeiro carregamento, em vez de aparecer tudo
+   de uma vez (o que também contribui pra sensação de slide estático). só opacidade, sem
+   transform, pra não mexer no containing block dos botões flutuantes (position:fixed). */
+#app{ opacity:0; animation:appWake .5s var(--ease) forwards; animation-delay:.04s; }
+@keyframes appWake{ from{ opacity:0; } to{ opacity:1; } }
+
+/* ---------- Revista (book) ---------- */
+#revistaWrap{ display:flex; flex-direction:column; min-height:calc(100vh - 64px); }
+#stage{
+  position:relative; flex:1; display:flex; align-items:center; justify-content:center;
+  perspective:2800px; padding:18px 54px 20px; min-height:0; touch-action:none;
+}
+#stage::before{
+  /* halo suave atrás do livro pra ele "flutuar" com presença em vez de sumir num fundo
+     plano — resolve a sensação de "cor morta" atrás da revista.
+     Importante: isso é ESTÁTICO de propósito, sem animação contínua. Uma respiração/pulso
+     infinito aqui (testado e revertido) prejudicava a física real do arrasto de virar
+     página — provavelmente por competir com o mesmo contexto de composição 3D do #stage
+     (perspective) durante o gesto. Arrastar a página com confiabilidade é mais importante
+     que um efeito decorativo, então o halo fica bonito mas parado. */
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(46% 58% at 50% 48%, rgba(232,174,48,.16) 0%, rgba(232,174,48,.05) 42%, transparent 72%);
+}
+#book{ z-index:1; }
+#book{
+  position:relative;
+  /* efeito "caderno": camadas de box-shadow sem blur simulam páginas empilhadas
+     por trás, saindo levemente pelo canto — sem custar nada de performance
+     (box-shadow sem raio de desfoque é praticamente grátis pro navegador,
+     bem diferente de um filter/backdrop-filter). */
+  box-shadow:
+    5px 6px 0 0 #FBF3E3,
+    5px 6px 0 1px rgba(43,33,24,.07),
+    10px 12px 0 0 #F2E6CD,
+    10px 12px 0 1px rgba(43,33,24,.09),
+    var(--shadow-lg),
+    0 2px 0 rgba(255,255,255,.6) inset;
+  border-radius:7px;
+  background:var(--paper);
+}
+#book::after{
+  content:""; position:absolute; left:50%; top:0; bottom:0; width:14px; margin-left:-7px;
+  background:linear-gradient(90deg, rgba(43,33,24,.14), rgba(43,33,24,.02) 40%, rgba(43,33,24,.02) 60%, rgba(43,33,24,.14));
+  z-index:6; pointer-events:none; border-radius:2px;
+}
+/* Virtualização: por padrão a folha nem participa do layout/pintura (display:none é
+   praticamente grátis pro navegador). Só as poucas folhas perto da página atual (.in-window)
+   voltam a existir de verdade — é o que evita o travamento em celular fraco com 92 páginas. */
+.leaf{ display:none; }
+.leaf.in-window{
+  display:block; position:absolute; inset:0; transform-origin:left center; transform-style:preserve-3d;
+  pointer-events:none; touch-action:none;
+}
+.leaf.in-window.active{ pointer-events:auto; }
+.leaf.in-window.animating{ transition:transform .62s cubic-bezier(.22,.61,.32,1); will-change:transform; }
+.leaf .face{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:6px; overflow:hidden; background:var(--paper); touch-action:none; }
+.leaf .face img{ width:100%; height:100%; object-fit:cover; display:block; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.leaf .back{
+  transform:rotateY(180deg);
+  display:flex; align-items:center; justify-content:center;
+  background:
+    repeating-linear-gradient(0deg, rgba(43,33,24,.02) 0 2px, transparent 2px 4px),
+    #FBF3E3;
+}
+.leaf .back .wm{ color:rgba(11,42,82,.12); font-weight:800; font-size:13px; letter-spacing:3px; transform:rotate(-90deg); white-space:nowrap; }
+.leaf .shade{ position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(0,0,0,.32), rgba(0,0,0,0) 16%); opacity:0; }
+.skel{
+  position:absolute; inset:0; border-radius:6px;
+  background:linear-gradient(100deg, #F3E7CE 8%, #FBF3E1 18%, #F3E7CE 33%);
+  background-size:200% 100%; animation:shimmer 1.3s linear infinite;
+}
+@keyframes shimmer{ from{background-position:200% 0;} to{background-position:-200% 0;} }
+
+.hotspot{
+  position:absolute; border:2px solid transparent; border-radius:8px; cursor:pointer;
+  transition:background .15s, border-color .15s;
+  /* essencial: sem isso, um arrasto que começa em cima de um produto (as páginas são
+     bem cheias de hotspots) podia ser capturado pelo navegador como scroll nativo em
+     vez de virar a página — o touch-action:none do #stage nem sempre "desce" de forma
+     confiável pra elementos filhos com posição própria, então declaramos aqui também. */
+  touch-action:none;
+}
+.hotspot:hover, .hotspot:active{ background:rgba(232,174,48,.16); border-color:rgba(232,174,48,.85); }
+/* selo de "já selecionado" — some direto em cima da foto do produto na página,
+   assim o cliente enxerga o que já escolheu sem precisar abrir o carrinho. */
+.hotspot.selected{ border-color:rgba(198,137,15,.55); background:rgba(232,174,48,.08); }
+.hotspot.selected::after{
+  content:"✓"; position:absolute; top:-9px; right:-9px; width:22px; height:22px; border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; font-weight:900; font-size:12px;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(198,137,15,.5), 0 0 0 2px #fff;
+}
+/* botão "i" — canto oposto ao selo de check. Abre os detalhes/quantidade sem
+   precisar tocar o hotspot inteiro (que agora seleciona direto no toque). */
+.hotspot-info{
+  position:absolute; bottom:-9px; left:-9px; width:22px; height:22px; border-radius:50%;
+  background:rgba(11,42,82,.88); color:#fff; border:2px solid #fff; font-family:var(--font-display);
+  font-weight:700; font-size:12px; font-style:italic; line-height:1; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(11,42,82,.4);
+  touch-action:none;
+}
+.hotspot-info:hover{ background:var(--navy2); }
+
+.edge-btn{
+  /* z-index bem acima do maior z-index possível de uma folha (até TOTAL_PAGES=92) —
+     essencial no mobile, onde o botão fica sobreposto em cima da própria página. */
+  position:absolute; top:0; bottom:0; width:52px; z-index:150; background:transparent; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; color:var(--text-navy); font-size:22px; opacity:.55;
+  transition:opacity .16s, transform .16s;
+}
+.edge-btn:hover{ opacity:1; }
+.edge-btn:active{ transform:scale(.88); }
+#prevBtn{ left:0; } #nextBtn{ right:0; }
+
+#hud{
+  flex:0 0 auto; display:flex; align-items:center; justify-content:center; gap:14px; padding:6px 16px 18px; color:var(--sub); font-size:12px;
+}
+#progress{ width:min(46vw,340px); height:5px; background:var(--line); border-radius:3px; overflow:hidden; }
+#progressBar{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--red)); transition:width .3s var(--ease); }
+#deptLabel{ color:var(--text-navy); font-weight:700; font-family:var(--font-display); font-size:13px; }
+
+/* ---------- Índice (TOC) ---------- */
+#overlay{ position:fixed; inset:0; background:rgba(20,14,8,.42); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:.28s var(--ease); z-index:90; }
+#overlay.show{ opacity:1; pointer-events:auto; }
+.drawer{
+  position:fixed; top:0; right:0; bottom:0; width:380px; max-width:92vw; background:var(--paper);
+  box-shadow:-18px 0 48px rgba(43,33,24,.28); transform:translateX(100%); transition:.34s var(--ease); z-index:100;
+  display:flex; flex-direction:column;
+}
+.drawer.open{ transform:translateX(0); }
+.drawer-head{ padding:18px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; background:var(--paper); }
+.drawer-head h3{ margin:0; color:var(--text-navy); font-size:18px; }
+.drawer-body{ overflow-y:auto; padding:10px; flex:1; }
+.btn-x{
+  background:var(--cream2); border:none; color:var(--text-navy); border-radius:9px; width:32px; height:32px; cursor:pointer; font-size:14px;
+  transition:background .15s, transform .15s;
+}
+.btn-x:hover{ background:#F6DFA8; }
+.btn-x:active{ transform:scale(.9); }
+
+.toc-dept{ font-size:10.5px; text-transform:uppercase; letter-spacing:.8px; color:var(--gold-deep); font-weight:800; padding:14px 8px 5px; font-family:var(--font-body); }
+.toc-item{ display:flex; gap:11px; padding:9px 8px; border-radius:11px; cursor:pointer; align-items:center; transition:background .15s var(--ease), transform .15s var(--ease); }
+.toc-item:hover{ background:var(--cream2); transform:translateX(2px); }
+.toc-item img{ width:38px; height:50px; object-fit:cover; border-radius:5px; box-shadow:var(--shadow-sm); }
+.toc-item .ttl{ font-size:13px; font-weight:700; color:var(--ink); font-family:var(--font-display); }
+.toc-item .sub{ font-size:10.5px; color:var(--sub); margin-top:1px; }
+
+/* ---------- Catálogo Rápido ---------- */
+#fastView{ padding:16px 20px 70px; }
+.toolbar{ display:flex; gap:8px; margin-bottom:13px; flex-wrap:wrap; }
+.toolbar input{
+  flex:1 1 240px; background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:12px;
+  padding:11px 14px; font-size:14px; transition:border-color .16s, box-shadow .16s;
+}
+.toolbar input:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
+.select-filter{
+  flex:0 1 auto; background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:12px;
+  padding:11px 12px; font-size:13px; font-weight:600; cursor:pointer; transition:border-color .16s, box-shadow .16s;
+  font-family:var(--font-body); appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='%237A6A57' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; padding-right:30px;
+}
+.select-filter:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
+.chk-filter{
+  display:flex; align-items:center; gap:7px; padding:11px 14px; background:var(--paper); border:1px solid var(--line);
+  border-radius:12px; font-size:13px; font-weight:600; color:var(--sub); cursor:pointer; white-space:nowrap; user-select:none;
+  transition:border-color .16s, color .16s;
+}
+.chk-filter input{ accent-color:var(--gold-deep); width:15px; height:15px; cursor:pointer; }
+.chk-filter:has(input:checked){ border-color:var(--gold-deep); color:var(--ink); }
+.chip-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:10px; }
+.chip{
+  border:1px solid var(--line); background:var(--paper); color:var(--text-navy); border-radius:999px; padding:7px 14px;
+  font-size:12px; cursor:pointer; white-space:nowrap; font-weight:600; transition:transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.chip:hover{ transform:translateY(-1px); }
+.chip.active{ background:linear-gradient(135deg,var(--gold),#F6C863); border-color:transparent; color:#3a2a00; box-shadow:var(--shadow-gold); }
+#resultCount{ color:var(--sub); font-size:12px; margin-bottom:10px; }
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(196px,1fr)); gap:18px; }
+.card{
+  background:var(--paper); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  display:flex; flex-direction:column; box-shadow:var(--shadow-sm);
+  transition:box-shadow .22s var(--ease), transform .22s var(--ease), border-color .22s var(--ease);
+  position:relative;
+  /* entrada em cascata (fade + leve subida) — sem isso, toda vez que filtra/busca a grade
+     inteira só "pisca" pro resultado novo, o que reforça a sensação de slide estático. */
+  opacity:0; animation:cardIn .36s var(--ease) forwards; animation-delay:var(--card-delay,0ms);
+}
+@keyframes cardIn{ from{ opacity:0; transform:translateY(9px) scale(.97); } to{ opacity:1; transform:none; } }
+.card:hover{ box-shadow:var(--shadow-md); transform:translateY(-5px); border-color:rgba(198,137,15,.35); }
+.card.selected{
+  border-color:rgba(198,137,15,.55);
+  box-shadow:var(--shadow-md), 0 0 0 1px rgba(198,137,15,.25) inset;
+}
+.card .img-wrap{
+  position:relative; overflow:hidden; aspect-ratio:1/1;
+  background:linear-gradient(160deg, var(--paper) 0%, rgba(232,174,48,.10) 100%);
+  display:flex; align-items:center; justify-content:center;
+  border-bottom:1px solid var(--line);
+}
+.card .sel-badge{
+  position:absolute; top:8px; left:8px; width:22px; height:22px; border-radius:50%; z-index:2;
+  background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; font-weight:900; font-size:12px;
+  display:none; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(198,137,15,.5), 0 0 0 2px #fff;
+}
+.card.selected .sel-badge{ display:flex; }
+.card img{
+  width:88%; height:88%; object-fit:contain; cursor:pointer;
+  transition:transform .35s var(--ease);
+}
+.card:hover img{ transform:scale(1.06); }
+.card .card-body{ padding:13px 14px 14px; display:flex; flex-direction:column; flex:1; min-width:0; }
+.card .cbrand{ font-size:10px; color:var(--gold-deep); font-weight:800; text-transform:uppercase; letter-spacing:.6px; }
+.card .cname{
+  font-family:var(--font-display); font-size:14.5px; font-weight:650; color:var(--ink); margin:4px 0 5px;
+  line-height:1.3; cursor:pointer; min-height:38px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.card .cmeta{ font-size:11.5px; color:var(--sub); line-height:1.5; margin-bottom:2px; }
+.card .cactions{ display:flex; gap:6px; margin-top:auto; padding-top:10px; }
+.card .cactions .btn-sm{ flex:1; text-align:center; }
+.btn-sm{
+  font-size:11px; border-radius:8px; padding:7px 10px; cursor:pointer; border:1px solid var(--line); background:#fff;
+  color:var(--text-navy); font-weight:700; transition:transform .14s var(--ease), box-shadow .14s var(--ease), background .14s var(--ease), color .14s var(--ease);
+}
+.btn-sm:hover{ transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+.btn-sm:active{ transform:translateY(0) scale(.96); }
+.btn-sm.primary{ background:linear-gradient(135deg,var(--gold),#F6C863); border-color:transparent; color:#3a2a00; }
+.btn-sm.primary.in-cart{ background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; }
+.empty-state{ color:var(--sub); text-align:center; padding:70px 20px; font-size:13px; line-height:1.6; }
+
+/* ---------- Product detail drawer ---------- */
+#productBody{ padding:18px; overflow-y:auto; flex:1; }
+#productBody .pimg{ width:100%; border-radius:12px; box-shadow:var(--shadow-lg); margin-bottom:16px; }
+#productBody h4{ margin:0 0 5px; color:var(--text-navy); font-size:19px; font-weight:600; }
+#productBody .pbrand{ color:var(--gold-deep); font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:.5px; }
+#productBody .p-in-cart-note{
+  display:none; align-items:center; gap:6px; font-size:12px; color:var(--gold-deep); font-weight:700;
+  background:rgba(232,174,48,.12); border-radius:9px; padding:8px 11px; margin:2px 0 12px;
+}
+#productBody .p-in-cart-note.show{ display:flex; }
+.field-row{ display:flex; justify-content:space-between; font-size:12.5px; padding:8px 0; border-bottom:1px dashed var(--line); }
+.field-row span:first-child{ color:var(--sub); }
+.qty-row{ display:flex; align-items:center; gap:11px; margin:18px 0; }
+.qty-btn{
+  width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:#fff; font-size:16px; cursor:pointer;
+  transition:transform .14s var(--ease), box-shadow .14s var(--ease);
+}
+.qty-btn:hover{ box-shadow:var(--shadow-sm); }
+.qty-btn:active{ transform:scale(.9); }
+.qty-val{ font-weight:800; font-size:17px; min-width:28px; text-align:center; font-family:var(--font-display); }
+.btn-primary{
+  background:linear-gradient(135deg,var(--red),#E8543F); color:#fff; border:none; font-weight:800; padding:13px 16px;
+  border-radius:12px; cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-red);
+  transition:transform .16s var(--ease), box-shadow .16s var(--ease);
+}
+.btn-primary:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(214,58,46,.4); }
+.btn-primary:active{ transform:translateY(0) scale(.98); }
+.btn-secondary{
+  background:var(--cream2); color:var(--text-navy); border:none; font-weight:700; padding:12px 16px; border-radius:12px;
+  cursor:pointer; font-size:13px; width:100%; margin-top:9px; transition:background .16s var(--ease), transform .16s var(--ease);
+}
+.btn-secondary:hover{ background:#F6DFA8; }
+.btn-secondary:active{ transform:scale(.98); }
+
+/* ---------- Orçamento (cart) ---------- */
+#cartFab{
+  position:fixed; bottom:20px; right:20px; z-index:70;
+  background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; border:none; border-radius:30px;
+  padding:14px 20px 14px 17px; display:flex; align-items:center; gap:8px; cursor:pointer;
+  box-shadow:0 12px 28px rgba(11,42,82,.42), 0 1px 0 rgba(255,255,255,.15) inset; font-weight:800; font-size:13px;
+  transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+#cartFab:hover{ transform:translateY(-2px); box-shadow:0 16px 34px rgba(11,42,82,.48); }
+#cartFab:active{ transform:translateY(0) scale(.97); }
+#cartFab .badge{ background:var(--red); border-radius:14px; padding:2px 8px; font-size:11px; box-shadow:0 2px 6px rgba(214,58,46,.5); }
+.cart-item{ display:flex; gap:11px; padding:11px 0; border-bottom:1px solid var(--line); align-items:center; }
+.cart-item img{ width:42px; height:56px; object-fit:cover; border-radius:6px; box-shadow:var(--shadow-sm); }
+.cart-item .ci-name{ font-size:12.5px; font-weight:700; color:var(--ink); }
+.cart-item .ci-meta{ font-size:10.5px; color:var(--sub); margin-top:1px; }
+.cart-item .ci-remove{ margin-left:auto; background:none; border:none; color:var(--red); cursor:pointer; font-size:16px; transition:transform .14s; }
+.cart-item .ci-remove:hover{ transform:scale(1.15); }
+#leadForm label{ display:block; font-size:11.5px; color:var(--sub); margin:11px 0 5px; font-weight:700; }
+#leadForm input{
+  width:100%; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13.5px; background:#fff;
+  transition:border-color .16s, box-shadow .16s;
+}
+#leadForm input:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
+
+/* rótulo de texto dos botões flutuantes — encolhe pra ícone só em telas estreitas (ver media query) */
+.fab-label{ white-space:nowrap; }
+
+/* ---------- Sound toggle ---------- */
+.sound-note{ font-size:10.5px; color:var(--sub); text-align:center; padding:6px 20px 2px; }
+
+/* ---------- IA Vendedora (chat) ---------- */
+#aiFab{
+  position:fixed; bottom:20px; left:20px; z-index:70;
+  background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; border:none; border-radius:30px;
+  padding:12px 20px 12px 13px; display:flex; align-items:center; gap:9px; cursor:pointer;
+  box-shadow:0 12px 28px rgba(11,42,82,.4), 0 1px 0 rgba(255,255,255,.15) inset; font-weight:800; font-size:13px;
+  transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+#aiFab:hover{ transform:translateY(-2px); box-shadow:0 16px 34px rgba(11,42,82,.46); }
+#aiFab:active{ transform:translateY(0) scale(.97); }
+#aiFab .fab-ico{
+  position:relative; width:30px; height:30px; border-radius:50%; flex:0 0 auto;
+  background:linear-gradient(135deg,var(--gold),#F6C863); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(198,137,15,.5);
+}
+#aiFab .fab-ico svg{ color:#3a2a00; }
+#aiFab .fab-dot{
+  position:absolute; bottom:-1px; right:-1px; width:9px; height:9px; border-radius:50%;
+  background:#3DDC7A; border:2px solid var(--navy); box-shadow:0 0 0 0 rgba(61,220,122,.6);
+  animation:aiPulse 2.2s ease-out infinite;
+}
+@keyframes aiPulse{
+  0%{ box-shadow:0 0 0 0 rgba(61,220,122,.55); }
+  70%{ box-shadow:0 0 0 7px rgba(61,220,122,0); }
+  100%{ box-shadow:0 0 0 0 rgba(61,220,122,0); }
+}
+.ai-panel{
+  position:fixed; bottom:20px; left:20px; z-index:120;
+  width:380px; max-width:92vw; height:min(600px,78vh);
+  background:var(--paper); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg), 0 0 0 1px rgba(43,33,24,.05);
+  display:flex; flex-direction:column; overflow:hidden;
+  transform:translateY(18px) scale(.96); opacity:0; pointer-events:none;
+  transition:transform .3s var(--ease), opacity .3s var(--ease);
+}
+.ai-panel.open{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
+.ai-head{ display:flex; align-items:center; gap:11px; padding:15px 16px; background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; flex:0 0 auto; }
+.ai-avatar{
+  width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00;
+  display:flex; align-items:center; justify-content:center; font-weight:900; font-family:var(--font-display); font-size:17px;
+  box-shadow:0 3px 8px rgba(0,0,0,.25);
+}
+.ai-head-info{ min-width:0; }
+.ai-name{ font-weight:800; font-size:14.5px; font-family:var(--font-display); }
+.ai-status{ font-size:10.5px; opacity:.88; display:flex; align-items:center; gap:5px; margin-top:1px; }
+.ai-status .dot{ width:7px; height:7px; border-radius:50%; background:#4ADE80; display:inline-block; box-shadow:0 0 0 2px rgba(74,222,128,.25); }
+.ai-head .btn-x{ margin-left:auto; background:rgba(255,255,255,.16); color:#fff; }
+.ai-head .btn-x:hover{ background:rgba(255,255,255,.28); }
+.ai-body{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:9px; background:var(--cream); }
+.msg{ max-width:82%; padding:10px 14px; border-radius:15px; font-size:13.5px; line-height:1.5; }
+.msg.user{ align-self:flex-end; background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; border-bottom-right-radius:4px; font-weight:600; }
+.msg.ai{ align-self:flex-start; background:#fff; color:var(--ink); border:1px solid var(--line); border-bottom-left-radius:4px; box-shadow:var(--shadow-sm); }
+.msg.chat-product{ display:flex; gap:11px; align-items:center; max-width:90%; padding:11px; }
+.msg.chat-product img{ width:46px; height:60px; object-fit:cover; border-radius:7px; flex:0 0 auto; box-shadow:0 4px 10px rgba(43,33,24,.2); }
+.cp-info{ min-width:0; }
+.cp-name{ font-size:12.5px; font-weight:700; font-family:var(--font-display); line-height:1.3; }
+.cp-meta{ font-size:10.5px; color:var(--sub); margin:2px 0 6px; }
+.cp-add{ font-size:11px; padding:6px 11px; }
+.ai-typing{ padding:0 18px 12px; display:none; gap:4px; background:var(--cream); flex:0 0 auto; }
+.ai-typing.show{ display:flex; }
+.ai-typing span{ width:6px; height:6px; border-radius:50%; background:var(--sub); opacity:.5; animation:aibounce 1s infinite; }
+.ai-typing span:nth-child(2){ animation-delay:.15s; }
+.ai-typing span:nth-child(3){ animation-delay:.3s; }
+@keyframes aibounce{ 0%,60%,100%{ transform:translateY(0); } 30%{ transform:translateY(-5px); } }
+.ai-input-row{ display:flex; gap:9px; padding:13px; border-top:1px solid var(--line); background:#fff; flex:0 0 auto; }
+.ai-input-row input{
+  flex:1; border:1px solid var(--line); border-radius:24px; padding:10px 16px; font-size:13.5px;
+  transition:border-color .16s, box-shadow .16s;
+}
+.ai-input-row input:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
+.ai-send{
+  width:42px; height:42px; border-radius:50%; border:none; background:linear-gradient(135deg,var(--red),#E8543F); color:#fff;
+  cursor:pointer; font-size:15px; flex:0 0 auto; transition:transform .16s var(--ease), box-shadow .16s var(--ease);
+  box-shadow:var(--shadow-red);
+}
+.ai-send:hover{ transform:translateY(-1px) scale(1.04); }
+.ai-send:active{ transform:scale(.94); }
+
+@media (max-width:700px){
+  header{ padding:9px 12px; gap:6px; }
+  /* praticamente sem padding lateral — o livro deve ocupar a tela do celular
+     de verdade, não flutuar pequeno no meio de espaço vazio. As setas viram
+     botões circulares flutuando por cima da borda da página (ver .edge-btn abaixo),
+     em vez de empurrar o livro pra dentro reservando uma faixa de cada lado. */
+  #stage{ padding:6px 4px 14px; }
+  #revistaWrap{ min-height:calc(100vh - 58px); }
+  .edge-btn{
+    top:50%; bottom:auto; transform:translateY(-50%); width:38px; height:38px; font-size:17px;
+    background:rgba(255,253,249,.85); backdrop-filter:blur(4px); border-radius:50%; opacity:.92;
+    box-shadow:var(--shadow-md); margin:0 4px;
+  }
+  .edge-btn:active{ transform:translateY(-50%) scale(.88); }
+  #prevBtn{ left:2px; } #nextBtn{ right:2px; }
+  #book{
+    box-shadow:
+      3px 4px 0 0 #FBF3E3, 3px 4px 0 1px rgba(43,33,24,.07),
+      6px 8px 0 0 #F2E6CD, 6px 8px 0 1px rgba(43,33,24,.09),
+      0 10px 26px rgba(43,33,24,.16), 0 2px 0 rgba(255,255,255,.6) inset;
+  }
+  .brand-sub{ display:none; }
+  .brand-logo{ height:24px; }
+  .menu-btn{ width:34px; height:34px; }
+  nav.mode-toggle{ padding:3px; gap:2px; }
+  nav.mode-toggle button{ padding:8px 10px; }
+  nav.mode-toggle button span{ display:none; }
+  #searchTop{ width:104px; padding:9px 10px; }
+  .fab-label{ display:none; }
+  #cartFab, #aiFab{ padding:14px; border-radius:50%; }
+  .ai-panel{
+    left:12px; right:12px; bottom:12px; width:auto; max-width:none; height:min(560px,80vh);
+  }
+  .sound-note{ font-size:10px; padding:4px 16px 0; }
+  #hud{ gap:10px; padding:5px 14px 12px; }
+  #progress{ width:min(50vw,260px); }
+}
+
+/* ---------- Splash (tela de boas-vindas, só na primeira visita) ---------- */
+/* Fica num container totalmente separado do #stage/#book — nenhuma animação daqui
+   compartilha contexto 3D com a revista, então não existe o mesmo risco que já vimos
+   com a animação do halo (ver comentário em #stage::before). É sempre no tom "claro/dourado"
+   da marca, independente do tema claro/escuro escolhido no site — é a "porta de entrada",
+   então tem identidade própria. */
+#splashScreen{
+  position:fixed; inset:0; z-index:500;
+  display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center;
+  padding:32px; overflow:hidden;
+  opacity:1; visibility:visible;
+  transition:opacity .5s var(--ease), visibility 0s linear 0s;
+}
+#splashScreen.skip{ display:none; }
+#splashScreen.hide{ opacity:0; visibility:hidden; transition:opacity .5s var(--ease), visibility 0s linear .5s; pointer-events:none; }
+.splash-bg{
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(60% 50% at 20% 15%, rgba(232,174,48,.35) 0%, transparent 60%),
+    radial-gradient(55% 45% at 85% 80%, rgba(18,59,112,.9) 0%, transparent 60%),
+    linear-gradient(160deg, #0B2A52 0%, #123B70 55%, #0B2A52 100%);
+  background-size:140% 140%, 140% 140%, 100% 100%;
+  background-position:0% 0%, 100% 100%, 0 0;
+  animation:splashDrift 22s ease-in-out infinite;
+}
+@keyframes splashDrift{
+  0%, 100%{ background-position:0% 0%, 100% 100%, 0 0; }
+  50%{ background-position:14% 10%, 86% 92%, 0 0; }
+}
+.splash-content{ position:relative; z-index:1; max-width:440px; display:flex; flex-direction:column; align-items:center; }
+.splash-logo{
+  height:52px; width:auto; margin-bottom:26px; animation:splashMarkIn .7s var(--ease) .1s both;
+  background:rgba(255,255,255,.95); padding:10px 18px; border-radius:12px;
+  box-shadow:0 16px 40px rgba(0,0,0,.35);
+}
+.splash-title{
+  font-family:var(--font-display); font-weight:700; font-size:27px; color:#FFFDF6;
+  margin:0 0 12px; letter-spacing:-.01em; line-height:1.2;
+  animation:splashUpIn .6s var(--ease) .22s both;
+}
+.splash-sub{
+  font-family:var(--font-body); font-size:14px; color:rgba(255,253,246,.78); line-height:1.6;
+  margin:0 0 30px;
+  animation:splashUpIn .6s var(--ease) .32s both;
+}
+.splash-btn{
+  background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; border:none; font-weight:800;
+  padding:14px 26px; border-radius:14px; cursor:pointer; font-size:14px; font-family:var(--font-body);
+  box-shadow:0 14px 32px rgba(198,137,15,.4); transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+  animation:splashUpIn .6s var(--ease) .42s both;
+}
+.splash-btn:hover{ transform:translateY(-2px); box-shadow:0 18px 40px rgba(198,137,15,.48); }
+.splash-btn:active{ transform:translateY(0) scale(.97); }
+@keyframes splashMarkIn{ from{ opacity:0; transform:scale(.8); } to{ opacity:1; transform:none; } }
+@keyframes splashUpIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  .splash-bg{ animation:none; }
+}
