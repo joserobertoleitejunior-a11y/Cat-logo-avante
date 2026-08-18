@@ -1,0 +1,554 @@
+[
+ {
+  "page": 1,
+  "title": "Capa",
+  "brand": "Institucional / Avante",
+  "dept": "Institucional"
+ },
+ {
+  "page": 2,
+  "title": "Sobre a Casaredo",
+  "brand": "Institucional / Avante",
+  "dept": "Institucional"
+ },
+ {
+  "page": 3,
+  "title": "Laminados & Rosca 250g",
+  "brand": "Casaredo",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 4,
+  "title": "Wafer Yupi, Cookies & Linha Mundo Verde",
+  "brand": "Casaredo",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 5,
+  "title": "Laminados & Roscas My Bit",
+  "brand": "My Bit",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 6,
+  "title": "Recheado & Wafer My Bit",
+  "brand": "My Bit",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 7,
+  "title": "Bolachas Nordestina",
+  "brand": "Nordestina",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 8,
+  "title": "Leite de Coco & Coco Flocado",
+  "brand": "Coco & Cia",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 9,
+  "title": "Coco Ralado & Óleo de Coco",
+  "brand": "Coco & Cia",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 10,
+  "title": "Granolas (Kobber / Villamar)",
+  "brand": "Kobber",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 11,
+  "title": "Barra de Cereais & Linha Nuts",
+  "brand": "Kobber",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 12,
+  "title": "Barra de Cereais / Nuts CT & Proteína",
+  "brand": "Kobber",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 13,
+  "title": "Barra de Cereais Trio",
+  "brand": "Trio",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 14,
+  "title": "Doce de Leite Tabletes (Display)",
+  "brand": "Portão de Cambuí",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 15,
+  "title": "Doce de Leite Tabletes (Sachê)",
+  "brand": "Portão de Cambuí",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 16,
+  "title": "COM 40 UM DE 25GR",
+  "brand": "",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 17,
+  "title": "COM 40 UM DE 25GR",
+  "brand": "",
+  "dept": "Biscoitos & Bolachas"
+ },
+ {
+  "page": 18,
+  "title": "Bala de Banana Oliveira 500gr",
+  "brand": "",
+  "dept": "Balas & Doces (Oliveira)"
+ },
+ {
+  "page": 19,
+  "title": "Bala de Banana Oliveira 500gr",
+  "brand": "",
+  "dept": "Balas & Doces (Oliveira)"
+ },
+ {
+  "page": 20,
+  "title": "Bala de Banana Oliveira 500gr",
+  "brand": "",
+  "dept": "Balas & Doces (Oliveira)"
+ },
+ {
+  "page": 21,
+  "title": "Bala de Banana Oliveira 500gr",
+  "brand": "",
+  "dept": "Balas & Doces (Oliveira)"
+ },
+ {
+  "page": 22,
+  "title": "LINHA TABLETES",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 23,
+  "title": "Bib’s Copo – 180g",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 24,
+  "title": "BOMBONS SORTIDOS",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 25,
+  "title": "STICKS BIB’S",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 26,
+  "title": "LINHA MU-MU",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 27,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 28,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 29,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 30,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 31,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 32,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 33,
+  "title": "LINHA DOCES AURORA",
+  "brand": "",
+  "dept": "Doces Aurora"
+ },
+ {
+  "page": 34,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 35,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 36,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 37,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 38,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 39,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 40,
+  "title": "Go Jelly Tubinho 12x70g",
+  "brand": "",
+  "dept": "Balas de Goma (Go Jelly)"
+ },
+ {
+  "page": 41,
+  "title": "Linha Torrone - Varejo",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 42,
+  "title": "Linha Bombom – 24 x 55G",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 43,
+  "title": "Tub-in",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 44,
+  "title": "Diversos",
+  "brand": "",
+  "dept": "Chocolates & Bombons"
+ },
+ {
+  "page": 45,
+  "title": "Salgadinho de Trigo - 55g",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 46,
+  "title": "Batata Ondulada - 40g",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 47,
+  "title": "Batata Ondulada - 40g",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 48,
+  "title": "Batata Ondulada - 40g",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 49,
+  "title": "Dip Loko Gummy HOTDOG",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 50,
+  "title": "APITO LOKO",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 51,
+  "title": "Dip Loko NEON DONUTS          VOA LOKO NEON",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 52,
+  "title": "RING LOKO CAVEIRA",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 53,
+  "title": "COGUMELO     DONUT´S",
+  "brand": "",
+  "dept": "Salgadinhos & Guloseimas"
+ },
+ {
+  "page": 54,
+  "title": "Bala Dadinho 90gr",
+  "brand": "",
+  "dept": "Amendoim & Paçoca (Dadinho)"
+ },
+ {
+  "page": 55,
+  "title": "Wafer Dadinho Avelã",
+  "brand": "",
+  "dept": "Amendoim & Paçoca (Dadinho)"
+ },
+ {
+  "page": 56,
+  "title": "Wafer Dadinho Avelã",
+  "brand": "",
+  "dept": "Amendoim & Paçoca (Dadinho)"
+ },
+ {
+  "page": 57,
+  "title": "MAIS SABOR PARA A SUA VIDA!",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 58,
+  "title": "Linha de PARRILLA.",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 59,
+  "title": "Sal de Parrilla 300grms",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 60,
+  "title": "Sal Grosso 500grms.",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 61,
+  "title": "Sal do Himalaia.",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 62,
+  "title": "Molhos Especiais 150ml.",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 63,
+  "title": "Molhos Especiais 150ml.",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 64,
+  "title": "LINHA ÁRABE - ‫الخط العربي‬",
+  "brand": "",
+  "dept": "Temperos, Sal & Molhos"
+ },
+ {
+  "page": 65,
+  "title": "Temperos 200g",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 66,
+  "title": "Molhos Especiais.",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 67,
+  "title": "LINHA BICO DOCE",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 68,
+  "title": "Molho Chimichurri.",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 69,
+  "title": "Goma de Tapioca",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 70,
+  "title": "Molhos Especiais",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 71,
+  "title": "Leite de Coco",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 72,
+  "title": "Geleia de Pimenta",
+  "brand": "",
+  "dept": "Temperos & Molhos"
+ },
+ {
+  "page": 73,
+  "title": "LINHA FAROFAS 250GR",
+  "brand": "",
+  "dept": "Farofas"
+ },
+ {
+  "page": 74,
+  "title": "FAROFA GOURMET 300GRMS",
+  "brand": "",
+  "dept": "Farofas"
+ },
+ {
+  "page": 75,
+  "title": "Néctar 12 x 1 Litro",
+  "brand": "",
+  "dept": "Bebidas (Néctar / Lata)"
+ },
+ {
+  "page": 76,
+  "title": "A Farinha de Milho",
+  "brand": "",
+  "dept": "Bebidas (Néctar / Lata)"
+ },
+ {
+  "page": 77,
+  "title": "LINHA LATA 473ML",
+  "brand": "",
+  "dept": "Bebidas (Néctar / Lata)"
+ },
+ {
+  "page": 78,
+  "title": "anos de existência no Brasil.",
+  "brand": "",
+  "dept": "Salgadinhos de Milho"
+ },
+ {
+  "page": 79,
+  "title": "pipoca temperado com sabor doce picante.",
+  "brand": "",
+  "dept": "Salgadinhos de Milho"
+ },
+ {
+  "page": 80,
+  "title": "FOLHA DE ALUMÍNIO",
+  "brand": "",
+  "dept": "Descartáveis & Embalagens"
+ },
+ {
+  "page": 81,
+  "title": "LINHA POLIESTER",
+  "brand": "",
+  "dept": "Descartáveis & Embalagens"
+ },
+ {
+  "page": 82,
+  "title": "LINHA POLIESTER",
+  "brand": "",
+  "dept": "Descartáveis & Embalagens"
+ },
+ {
+  "page": 83,
+  "title": "LINHA POLIESTER",
+  "brand": "",
+  "dept": "Descartáveis & Embalagens"
+ },
+ {
+  "page": 84,
+  "title": "LINHA POLIESTER",
+  "brand": "",
+  "dept": "Descartáveis & Embalagens"
+ },
+ {
+  "page": 85,
+  "title": "TopBel e Teta Bel (Marshmallow)",
+  "brand": "Bel",
+  "dept": "Balas, Marshmallow & Chocolates Bel"
+ },
+ {
+  "page": 86,
+  "title": "Bombons Sortidos Bel",
+  "brand": "Bel",
+  "dept": "Balas, Marshmallow & Chocolates Bel"
+ },
+ {
+  "page": 87,
+  "title": "Moedas de Chocolate Bel",
+  "brand": "Bel",
+  "dept": "Balas, Marshmallow & Chocolates Bel"
+ },
+ {
+  "page": 88,
+  "title": "Pipoca Pronta Pop Up",
+  "brand": "Pop Up",
+  "dept": "Balas, Marshmallow & Chocolates Bel"
+ },
+ {
+  "page": 89,
+  "title": "Chocolate Diet Diatt",
+  "brand": "Diatt",
+  "dept": "Chocolates (Diatt / Golden)"
+ },
+ {
+  "page": 90,
+  "title": "Chocolate Golden",
+  "brand": "Golden",
+  "dept": "Chocolates (Diatt / Golden)"
+ },
+ {
+  "page": 91,
+  "title": "Maruchan (Lámen / Yakisoba)",
+  "brand": "Maruchan",
+  "dept": "Macarrão Instantâneo Maruchan"
+ },
+ {
+  "page": 92,
+  "title": "Pilhas Alcalinas Toshiba",
+  "brand": "Toshiba",
+  "dept": "Pilhas"
+ }
+]

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /crm/
+Disallow: /backend/
+
+Sitemap: https://catalogo.avantedistribuicao.com.br/sitemap.xml
