@@ -580,7 +580,7 @@ main{ max-width:1400px; margin:0 auto; }
 .ai-send:active{ transform:scale(.94); }
 
 @media (max-width:700px){
-  header{ padding:9px 12px; gap:6px; }
+  header{ padding:8px 9px; gap:5px; }
   /* praticamente sem padding lateral — o livro deve ocupar a tela do celular
      de verdade, não flutuar pequeno no meio de espaço vazio. As setas viram
      botões circulares flutuando por cima da borda da página (ver .edge-btn abaixo),
@@ -600,13 +600,24 @@ main{ max-width:1400px; margin:0 auto; }
       6px 8px 0 0 #F2E6CD, 6px 8px 0 1px rgba(43,33,24,.09),
       0 10px 26px rgba(43,33,24,.16), 0 2px 0 rgba(255,255,255,.6) inset;
   }
+  .brand{ gap:7px; }
   .brand-sub{ display:none; }
-  .brand-logo{ height:24px; }
-  .menu-btn{ width:34px; height:34px; }
-  nav.mode-toggle{ padding:3px; gap:2px; }
-  nav.mode-toggle button{ padding:8px 10px; }
+  .brand-logo{ height:20px; }
+  html[data-theme="dark"] .brand-logo{ padding:4px 7px; }
+  .menu-btn{ width:30px; height:30px; }
+  nav.mode-toggle{ padding:2px; gap:2px; }
+  nav.mode-toggle button{ padding:7px 8px; }
   nav.mode-toggle button span{ display:none; }
-  #searchTop{ width:104px; padding:9px 10px; }
+  .header-actions{ gap:5px; }
+  .icon-btn{ width:34px; height:34px; }
+  /* a barra do header (menu + logo + toggle + ícones + busca) não cabe numa linha só
+     em telas de ~375-414px mesmo com os ajustes acima (overflow real, medido), o que
+     forçava um segundo "renglão" cortado e feio no topo. Busca some (o índice/tocBtn
+     já cobre navegação por departamento/página no mobile) e o botão de som só aparece
+     no modo Revista, onde ele faz sentido — no Catálogo Rápido (modo padrão) ele só
+     ocupava espaço sem função. */
+  #searchTop{ display:none; }
+  #app.mode-fast #soundBtn{ display:none; }
   .fab-label{ display:none; }
   #cartFab, #aiFab{ padding:14px; border-radius:50%; }
   .ai-panel{
