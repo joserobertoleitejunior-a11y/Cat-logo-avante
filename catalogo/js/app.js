@@ -255,7 +255,7 @@ function render(){
   }
   const visiblePage = Math.min(current+1, TOTAL_PAGES);
   document.getElementById('pageLabel').textContent = visiblePage + ' / ' + TOTAL_PAGES;
-  document.getElementById('progressBar').style.width = (visiblePage/TOTAL_PAGES*100) + '%';
+  document.getElementById('progressBar').style.transform = `scaleX(${visiblePage/TOTAL_PAGES})`;
   const info = TOC_BY_PAGE[visiblePage];
   document.getElementById('deptLabel').textContent = info ? (info.brand? info.brand+' · ':'') + info.title : '';
   updateImageWindow();
