@@ -119,7 +119,10 @@ header{
   flex-wrap:wrap;
 }
 .brand{ display:flex; align-items:center; gap:11px; }
-.brand-logo{ display:block; height:30px; width:auto; flex:0 0 auto; }
+/* transform-origin embaixo à esquerda — o logo "cresce" a partir do canto onde
+   fica ancorado no header, em vez de esticar pro centro (ficaria estranho ao lado
+   do botão de menu). O JS (headerParallax, no fim de app.js) só seta transform. */
+.brand-logo{ display:block; height:30px; width:auto; flex:0 0 auto; transform-origin:left center; will-change:transform; }
 .brand-sub{
   font-family:var(--font-body); font-weight:600; color:var(--sub); font-size:10.5px; letter-spacing:.6px;
   text-transform:uppercase; white-space:nowrap; align-self:center;
@@ -167,17 +170,6 @@ html[data-theme="dark"] .menu-btn:hover, html[data-theme="dark"] .menu-btn:focus
   background:transparent; color:var(--sub); display:flex; align-items:center; justify-content:center; cursor:pointer;
 }
 
-nav.mode-toggle{ display:flex; gap:4px; background:var(--cream2); border-radius:13px; padding:4px; }
-nav.mode-toggle button{
-  border:none; background:transparent; color:var(--text-navy); padding:9px 16px; border-radius:10px;
-  font-size:13px; font-weight:700; cursor:pointer; font-family:var(--font-body); letter-spacing:.1px;
-  display:flex; align-items:center; gap:7px; transition:background .18s var(--ease), color .18s var(--ease), box-shadow .18s var(--ease);
-}
-nav.mode-toggle button svg{ opacity:.75; transition:opacity .18s var(--ease); flex:0 0 auto; }
-nav.mode-toggle button.active{ background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; box-shadow:var(--shadow-gold); }
-nav.mode-toggle button.active svg{ opacity:1; }
-nav.mode-toggle button:not(.active):hover{ background:rgba(255,255,255,.6); }
-
 .header-actions{ display:flex; align-items:center; gap:8px; }
 .icon-btn{
   width:38px; height:38px; border-radius:11px; border:1px solid var(--line); background:var(--paper);
@@ -196,16 +188,6 @@ nav.mode-toggle button:not(.active):hover{ background:rgba(255,255,255,.6); }
 }
 #searchTop:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.18); outline:none; }
 
-/* ---------- Views ---------- */
-/* troca de modo (Revista <-> Catálogo Rápido) com um crossfade suave em vez de um corte seco
-   — um corte instantâneo de tela cheia é exatamente o que faz o site parecer "slide trocando",
-   em vez de um app. .leaving/.entering são controladas por switchMode() no JS. */
-.view{ display:none; }
-.view.active{ display:block; }
-.view.leaving{ display:block; animation:viewOut .22s var(--ease) forwards; }
-.view.entering{ animation:viewIn .34s var(--ease); }
-@keyframes viewOut{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px) scale(.985); } }
-@keyframes viewIn{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
 main{ max-width:1400px; margin:0 auto; }
 
 /* o app inteiro "acorda" com um fade suave no primeiro carregamento, em vez de aparecer tudo
@@ -325,15 +307,18 @@ main{ max-width:1400px; margin:0 auto; }
   flex:0 0 auto; display:flex; align-items:center; justify-content:center; gap:14px; padding:6px 16px 18px; color:var(--sub); font-size:12px;
 }
 #progress{ width:min(46vw,340px); height:5px; background:var(--line); border-radius:3px; overflow:hidden; }
-#progressBar{ height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--red)); transition:width .3s var(--ease); }
+/* scaleX em vez de width: a barra de progresso muda a cada virada de página (gesto
+   frequente) — transform é acelerado por GPU e não força recálculo de layout a cada
+   frame, diferente de animar width. */
+#progressBar{ height:100%; width:100%; background:linear-gradient(90deg,var(--gold),var(--red)); transform:scaleX(0); transform-origin:left; transition:transform .3s var(--ease); }
 #deptLabel{ color:var(--text-navy); font-weight:700; font-family:var(--font-display); font-size:13px; }
 
 /* ---------- Índice (TOC) ---------- */
-#overlay{ position:fixed; inset:0; background:rgba(20,14,8,.42); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:.28s var(--ease); z-index:90; }
+#overlay{ position:fixed; inset:0; background:rgba(20,14,8,.42); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .28s var(--ease); z-index:90; }
 #overlay.show{ opacity:1; pointer-events:auto; }
 .drawer{
   position:fixed; top:0; right:0; bottom:0; width:380px; max-width:92vw; background:var(--paper);
-  box-shadow:-18px 0 48px rgba(43,33,24,.28); transform:translateX(100%); transition:.34s var(--ease); z-index:100;
+  box-shadow:-18px 0 48px rgba(43,33,24,.28); transform:translateX(100%); transition:transform .34s var(--ease); z-index:100;
   display:flex; flex-direction:column;
 }
 .drawer.open{ transform:translateX(0); }
@@ -354,88 +339,13 @@ main{ max-width:1400px; margin:0 auto; }
 .toc-item .ttl{ font-size:13px; font-weight:700; color:var(--ink); font-family:var(--font-display); }
 .toc-item .sub{ font-size:10.5px; color:var(--sub); margin-top:1px; }
 
-/* ---------- Catálogo Rápido ---------- */
-#fastView{ padding:16px 20px 70px; }
-.toolbar{ display:flex; gap:8px; margin-bottom:13px; flex-wrap:wrap; }
-.toolbar input{
-  flex:1 1 240px; background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:12px;
-  padding:11px 14px; font-size:14px; transition:border-color .16s, box-shadow .16s;
+/* ---------- Busca do índice ---------- */
+.toc-search-wrap{ padding:14px 16px 0; }
+.toc-search-wrap input{
+  width:100%; background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:12px;
+  padding:11px 14px; font-size:13.5px; font-family:var(--font-body); transition:border-color .16s, box-shadow .16s;
 }
-.toolbar input:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
-.select-filter{
-  flex:0 1 auto; background:var(--paper); border:1px solid var(--line); color:var(--ink); border-radius:12px;
-  padding:11px 12px; font-size:13px; font-weight:600; cursor:pointer; transition:border-color .16s, box-shadow .16s;
-  font-family:var(--font-body); appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' fill='none' stroke='%237A6A57' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat:no-repeat; background-position:right 10px center; padding-right:30px;
-}
-.select-filter:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
-.chk-filter{
-  display:flex; align-items:center; gap:7px; padding:11px 14px; background:var(--paper); border:1px solid var(--line);
-  border-radius:12px; font-size:13px; font-weight:600; color:var(--sub); cursor:pointer; white-space:nowrap; user-select:none;
-  transition:border-color .16s, color .16s;
-}
-.chk-filter input{ accent-color:var(--gold-deep); width:15px; height:15px; cursor:pointer; }
-.chk-filter:has(input:checked){ border-color:var(--gold-deep); color:var(--ink); }
-.chip-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:10px; }
-.chip{
-  border:1px solid var(--line); background:var(--paper); color:var(--text-navy); border-radius:999px; padding:7px 14px;
-  font-size:12px; cursor:pointer; white-space:nowrap; font-weight:600; transition:transform .15s var(--ease), box-shadow .15s var(--ease);
-}
-.chip:hover{ transform:translateY(-1px); }
-.chip.active{ background:linear-gradient(135deg,var(--gold),#F6C863); border-color:transparent; color:#3a2a00; box-shadow:var(--shadow-gold); }
-#resultCount{ color:var(--sub); font-size:12px; margin-bottom:10px; }
-.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(196px,1fr)); gap:18px; }
-.card{
-  background:var(--paper); border:1px solid var(--line); border-radius:16px; overflow:hidden;
-  display:flex; flex-direction:column; box-shadow:var(--shadow-sm);
-  transition:box-shadow .22s var(--ease), transform .22s var(--ease), border-color .22s var(--ease);
-  position:relative;
-  /* entrada em cascata (fade + leve subida) — sem isso, toda vez que filtra/busca a grade
-     inteira só "pisca" pro resultado novo, o que reforça a sensação de slide estático. */
-  opacity:0; animation:cardIn .36s var(--ease) forwards; animation-delay:var(--card-delay,0ms);
-}
-@keyframes cardIn{ from{ opacity:0; transform:translateY(9px) scale(.97); } to{ opacity:1; transform:none; } }
-.card:hover{ box-shadow:var(--shadow-md); transform:translateY(-5px); border-color:rgba(198,137,15,.35); }
-.card.selected{
-  border-color:rgba(198,137,15,.55);
-  box-shadow:var(--shadow-md), 0 0 0 1px rgba(198,137,15,.25) inset;
-}
-.card .img-wrap{
-  position:relative; overflow:hidden; aspect-ratio:1/1;
-  background:linear-gradient(160deg, var(--paper) 0%, rgba(232,174,48,.10) 100%);
-  display:flex; align-items:center; justify-content:center;
-  border-bottom:1px solid var(--line);
-}
-.card .sel-badge{
-  position:absolute; top:8px; left:8px; width:22px; height:22px; border-radius:50%; z-index:2;
-  background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; font-weight:900; font-size:12px;
-  display:none; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(198,137,15,.5), 0 0 0 2px #fff;
-}
-.card.selected .sel-badge{ display:flex; }
-.card img{
-  width:88%; height:88%; object-fit:contain; cursor:pointer;
-  transition:transform .35s var(--ease);
-}
-.card:hover img{ transform:scale(1.06); }
-.card .card-body{ padding:13px 14px 14px; display:flex; flex-direction:column; flex:1; min-width:0; }
-.card .cbrand{ font-size:10px; color:var(--gold-deep); font-weight:800; text-transform:uppercase; letter-spacing:.6px; }
-.card .cname{
-  font-family:var(--font-display); font-size:14.5px; font-weight:650; color:var(--ink); margin:4px 0 5px;
-  line-height:1.3; cursor:pointer; min-height:38px;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
-}
-.card .cmeta{ font-size:11.5px; color:var(--sub); line-height:1.5; margin-bottom:2px; }
-.card .cactions{ display:flex; gap:6px; margin-top:auto; padding-top:10px; }
-.card .cactions .btn-sm{ flex:1; text-align:center; }
-.btn-sm{
-  font-size:11px; border-radius:8px; padding:7px 10px; cursor:pointer; border:1px solid var(--line); background:#fff;
-  color:var(--text-navy); font-weight:700; transition:transform .14s var(--ease), box-shadow .14s var(--ease), background .14s var(--ease), color .14s var(--ease);
-}
-.btn-sm:hover{ transform:translateY(-1px); box-shadow:var(--shadow-sm); }
-.btn-sm:active{ transform:translateY(0) scale(.96); }
-.btn-sm.primary{ background:linear-gradient(135deg,var(--gold),#F6C863); border-color:transparent; color:#3a2a00; }
-.btn-sm.primary.in-cart{ background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff; }
+.toc-search-wrap input:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
 .empty-state{ color:var(--sub); text-align:center; padding:70px 20px; font-size:13px; line-height:1.6; }
 
 /* ---------- Product detail drawer ---------- */
@@ -550,7 +460,19 @@ main{ max-width:1400px; margin:0 auto; }
 .ai-head .btn-x{ margin-left:auto; background:rgba(255,255,255,.16); color:#fff; }
 .ai-head .btn-x:hover{ background:rgba(255,255,255,.28); }
 .ai-body{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:9px; background:var(--cream); }
-.msg{ max-width:82%; padding:10px 14px; border-radius:15px; font-size:13.5px; line-height:1.5; }
+/* linha da mensagem — só as da Ana ganham avatar ao lado (o cliente não precisa
+   de um pra si mesmo); entrada com fade+leve subida, só transform/opacity
+   (acelerado por GPU), pra não pesar o chat mesmo depois de muitas mensagens. */
+.msg-row{ display:flex; gap:8px; align-items:flex-end; align-self:flex-start; max-width:88%; opacity:0; animation:msgIn .3s var(--ease) forwards; }
+@keyframes msgIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.msg-avatar{
+  width:24px; height:24px; border-radius:50%; flex:0 0 auto; margin-bottom:2px;
+  background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:800; font-size:11px;
+}
+.msg{ max-width:82%; padding:10px 14px; border-radius:15px; font-size:13.5px; line-height:1.5; opacity:0; animation:msgIn .3s var(--ease) forwards; }
+.msg-row .msg{ max-width:100%; }
 .msg.user{ align-self:flex-end; background:linear-gradient(135deg,var(--gold),#F6C863); color:#3a2a00; border-bottom-right-radius:4px; font-weight:600; }
 .msg.ai{ align-self:flex-start; background:#fff; color:var(--ink); border:1px solid var(--line); border-bottom-left-radius:4px; box-shadow:var(--shadow-sm); }
 .msg.chat-product{ display:flex; gap:11px; align-items:center; max-width:90%; padding:11px; }
@@ -580,7 +502,7 @@ main{ max-width:1400px; margin:0 auto; }
 .ai-send:active{ transform:scale(.94); }
 
 @media (max-width:700px){
-  header{ padding:9px 12px; gap:6px; }
+  header{ padding:8px 9px; gap:5px; }
   /* praticamente sem padding lateral — o livro deve ocupar a tela do celular
      de verdade, não flutuar pequeno no meio de espaço vazio. As setas viram
      botões circulares flutuando por cima da borda da página (ver .edge-btn abaixo),
@@ -600,13 +522,17 @@ main{ max-width:1400px; margin:0 auto; }
       6px 8px 0 0 #F2E6CD, 6px 8px 0 1px rgba(43,33,24,.09),
       0 10px 26px rgba(43,33,24,.16), 0 2px 0 rgba(255,255,255,.6) inset;
   }
+  .brand{ gap:7px; }
   .brand-sub{ display:none; }
-  .brand-logo{ height:24px; }
-  .menu-btn{ width:34px; height:34px; }
-  nav.mode-toggle{ padding:3px; gap:2px; }
-  nav.mode-toggle button{ padding:8px 10px; }
-  nav.mode-toggle button span{ display:none; }
-  #searchTop{ width:104px; padding:9px 10px; }
+  .brand-logo{ height:20px; }
+  html[data-theme="dark"] .brand-logo{ padding:4px 7px; }
+  .menu-btn{ width:30px; height:30px; }
+  .header-actions{ gap:5px; }
+  .icon-btn{ width:34px; height:34px; }
+  /* a barra do header (menu + logo + ícones + busca) não cabe numa linha só em telas de
+     ~375-414px mesmo com os ajustes acima (overflow real, medido) — a busca de página some
+     (o índice/tocBtn agora também busca produto por nome/marca, ver .toc-search-wrap). */
+  #searchTop{ display:none; }
   .fab-label{ display:none; }
   #cartFab, #aiFab{ padding:14px; border-radius:50%; }
   .ai-panel{

@@ -20,52 +20,46 @@ function log(...a){ console.log(...a); }
   await page.goto('http://localhost:8099/catalogo/index.html', { waitUntil: 'networkidle' });
   await page.waitForTimeout(500);
 
-  // ---------- SELEÇÃO NO CATÁLOGO RÁPIDO ----------
-  await page.click('#modeFastBtn');
-  await page.waitForTimeout(400);
+  // ---------- SELEÇÃO NO HOTSPOT DA REVISTA (único modo do site) ----------
+  // página 3 (Casaredo) tem vários hotspots
+  await page.fill('#searchTop', '3');
+  await page.press('#searchTop', 'Enter');
+  await page.waitForTimeout(700);
 
-  const firstCard = page.locator('.card').first();
-  const cod = await firstCard.getAttribute('data-codigo');
-  ok('primeiro card tem data-codigo: ' + cod);
+  const firstHotspot = page.locator('.leaf.in-window.active .hotspot').first();
+  const uid = await firstHotspot.getAttribute('data-uid');
+  ok('primeiro hotspot visível tem data-uid: ' + uid);
 
-  let selectedBefore = await page.evaluate((c) => document.querySelector(`.card[data-codigo="${c}"]`).classList.contains('selected'), cod);
-  selectedBefore === false ? ok('card começa não-selecionado') : fail('card já começa selecionado (inesperado)');
+  let selectedBefore = await page.evaluate((u) => document.querySelector(`.hotspot[data-uid="${u}"]`).classList.contains('selected'), uid);
+  selectedBefore === false ? ok('hotspot começa não-selecionado') : fail('hotspot já começa selecionado (inesperado)');
 
-  await firstCard.locator('.btn-sm.primary').click();
+  await firstHotspot.click();
   await page.waitForTimeout(200);
-  let selectedAfter = await page.evaluate((c) => document.querySelector(`.card[data-codigo="${c}"]`).classList.contains('selected'), cod);
-  selectedAfter === true ? ok('um toque seleciona o card (classe .selected aplicada)') : fail('card não ficou selecionado após o toque');
-
-  let btnText = await firstCard.locator('.btn-sm.primary').textContent();
-  btnText.includes('No orçamento') ? ok('botão muda de texto pra "No orçamento": ' + btnText.trim()) : fail('texto do botão não mudou: ' + btnText);
+  let selectedAfter = await page.evaluate((u) => document.querySelector(`.hotspot[data-uid="${u}"]`).classList.contains('selected'), uid);
+  selectedAfter === true ? ok('um toque seleciona o hotspot (selo de check aparece)') : fail('hotspot não ficou selecionado após o toque');
 
   const cartCountAfterSelect = await page.textContent('#cartCount');
   cartCountAfterSelect.trim() === '1' ? ok('carrinho atualizado com 1 item pela seleção direta') : fail('carrinho não bateu: ' + cartCountAfterSelect);
 
   // toca de novo — deve desselecionar (toggle)
-  await firstCard.locator('.btn-sm.primary').click();
+  await firstHotspot.click();
   await page.waitForTimeout(200);
-  let selectedToggleOff = await page.evaluate((c) => document.querySelector(`.card[data-codigo="${c}"]`).classList.contains('selected'), cod);
+  let selectedToggleOff = await page.evaluate((u) => document.querySelector(`.hotspot[data-uid="${u}"]`).classList.contains('selected'), uid);
   selectedToggleOff === false ? ok('segundo toque desseleciona (toggle completo)') : fail('não desselecionou no segundo toque');
+  await firstHotspot.click(); // seleciona de novo, pro resto do teste
 
-  // ---------- SELEÇÃO REFLETE NO HOTSPOT DA REVISTA ----------
-  await firstCard.locator('.btn-sm.primary').click(); // seleciona de novo
+  // ---------- BUSCA NO ÍNDICE LEVA ATÉ O PRODUTO ----------
+  const prodName = await page.evaluate((u) => {
+    const p = PRODUCTS.find(x => x.uid === u);
+    return p ? p.name : null;
+  }, uid);
+  await page.click('#tocBtn');
   await page.waitForTimeout(200);
-  const pagAttr = await page.evaluate((c) => {
-    // acha a página desse produto via PRODUCTS
-    const p = PRODUCTS.find(x => x.codigo === c);
-    return p ? p.page : null;
-  }, cod);
-  await page.click('#modeBookBtn');
+  await page.fill('#tocSearch', prodName.split(' ')[0]);
   await page.waitForTimeout(300);
-  await page.fill('#searchTop', String(pagAttr));
-  await page.press('#searchTop', 'Enter');
-  await page.waitForTimeout(700);
-  const hotspotSelected = await page.evaluate((c) => {
-    const hs = document.querySelector(`.hotspot[data-codigo="${c}"]`);
-    return hs ? hs.classList.contains('selected') : null;
-  }, cod);
-  hotspotSelected === true ? ok('hotspot na revista mostra selo de selecionado (checkmark)') : fail('hotspot não mostrou selo de selecionado: ' + hotspotSelected);
+  const searchHasResult = await page.evaluate((u) => !!document.querySelector(`#tocSearchResults .toc-item[data-uid="${u}"]`), uid);
+  searchHasResult ? ok('busca no índice encontra o produto pelo nome') : fail('busca no índice não encontrou o produto: ' + prodName);
+  await page.click('.btn-x[data-close-drawer="tocDrawer"]');
 
   if(errors.length){ errors.forEach(e=>fail('JS error (seleção): '+e)); errors.length = 0; } else { ok('nenhum erro JS no fluxo de seleção'); }
 

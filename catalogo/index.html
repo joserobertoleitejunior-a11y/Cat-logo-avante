@@ -91,7 +91,7 @@
   <a href="https://www.instagram.com/avantedistribuicao/" target="_blank" rel="noopener">📷 Instagram</a>
   <a href="https://www.google.com/maps/search/Rua+Sena+Madureira,+165,+Jd.+Vista+Alegre,+Campo+Limpo+Paulista,+SP" target="_blank" rel="noopener">📍 Rua Sena Madureira, 165 — Campo Limpo Paulista, SP</a>
 </nav>
-<div id="app" class="mode-fast">
+<div id="app">
   <header>
     <div class="brand">
       <button id="menuBtn" class="menu-btn" aria-label="Abrir menu" aria-expanded="false">
@@ -100,16 +100,6 @@
       <img class="brand-logo" src="/catalogo/images/logo-avante.png" alt="AVANTE Distribuição" width="140" height="33">
       <span class="brand-sub">Catálogo Digital</span>
     </div>
-    <nav class="mode-toggle">
-      <button id="modeBookBtn">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5c2-1 5-1 7 0v13c-2-1-5-1-7 0z"/><path d="M21 5.5c-2-1-5-1-7 0v13c2-1 5-1 7 0z"/></svg>
-        <span>Revista</span>
-      </button>
-      <button id="modeFastBtn" class="active">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><rect x="14" y="14" width="7" height="7" rx="1.4"/></svg>
-        <span>Catálogo Rápido</span>
-      </button>
-    </nav>
     <div class="header-actions">
       <input id="searchTop" type="text" placeholder="Ir para página / seção...">
       <button class="icon-btn" id="soundBtn" title="Som da página" aria-label="Ligar/desligar som">
@@ -130,7 +120,7 @@
 
   <main>
     <!-- REVISTA -->
-    <section id="revistaView" class="view">
+    <section id="revistaView">
       <div id="revistaWrap">
         <div id="stage">
           <button id="prevBtn" class="edge-btn" aria-label="Página anterior">&#10094;</button>
@@ -144,23 +134,6 @@
           <span id="deptLabel"></span>
         </div>
       </div>
-    </section>
-
-    <!-- CATÁLOGO RÁPIDO -->
-    <section id="fastView" class="view active">
-      <div class="toolbar">
-        <input id="fastSearch" type="text" placeholder="Buscar produto, marca, categoria ou código...">
-        <select id="brandFilter" class="select-filter"><option value="">Todas as marcas</option></select>
-        <select id="sortFilter" class="select-filter">
-          <option value="page">Ordem do catálogo</option>
-          <option value="name">Nome A–Z</option>
-          <option value="brand">Marca A–Z</option>
-        </select>
-        <label class="chk-filter"><input type="checkbox" id="onlySelected"><span>Só selecionados</span></label>
-      </div>
-      <div class="chip-row" id="chipRow"></div>
-      <div id="resultCount"></div>
-      <div class="grid" id="grid"></div>
     </section>
   </main>
 
@@ -201,7 +174,13 @@
 <!-- ÍNDICE -->
 <div id="tocDrawer" class="drawer">
   <div class="drawer-head"><h3>Índice do catálogo</h3><button class="btn-x" data-close-drawer="tocDrawer">✕</button></div>
-  <div class="drawer-body" id="tocList"></div>
+  <div class="toc-search-wrap">
+    <input id="tocSearch" type="text" placeholder="Buscar produto, marca ou código...">
+  </div>
+  <div class="drawer-body">
+    <div id="tocList"></div>
+    <div id="tocSearchResults" style="display:none;"></div>
+  </div>
 </div>
 
 <!-- PRODUTO -->

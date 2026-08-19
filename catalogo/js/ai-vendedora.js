@@ -130,7 +130,7 @@ function aiLocalEngine(text){
     return {
       lines: [aiFill(aiPick(AI_REPLIES.added), { qty, name: top.name })],
       products: [top],
-      addedCodes: [top.codigo]
+      addedUids: [top.uid]
     };
   }
   if(matches.length === 1){
@@ -168,15 +168,33 @@ async function aiGetResponse(text){
 // ============ UI DO CHAT ============
 function aiAddMessage(role, text){
   const wrap = document.getElementById('aiMessages');
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.textContent = text;
-  wrap.appendChild(div);
+  const bubble = document.createElement('div');
+  bubble.className = 'msg ' + role;
+  bubble.textContent = text;
+  if(role === 'ai'){
+    // mensagens da Ana ganham avatarzinho ao lado da bolha — o cliente não precisa de um pra si
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'msg-avatar';
+    avatar.textContent = 'A';
+    avatar.setAttribute('aria-hidden', 'true');
+    row.append(avatar, bubble);
+    wrap.appendChild(row);
+  } else {
+    wrap.appendChild(bubble);
+  }
   wrap.scrollTop = wrap.scrollHeight;
 }
 
 function aiAddProductCard(p, added){
   const wrap = document.getElementById('aiMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = 'A';
+  avatar.setAttribute('aria-hidden', 'true');
   const div = document.createElement('div');
   div.className = 'msg ai chat-product';
   const displayName = (typeof prettyName === 'function') ? prettyName(p.name) : p.name;
@@ -187,10 +205,11 @@ function aiAddProductCard(p, added){
       <div class="cp-meta">${p.caixa || ''}</div>
       <button class="btn-sm primary cp-add">${added ? '✓ adicionado' : '+ adicionar'}</button>
     </div>`;
+  row.append(avatar, div);
   const btn = div.querySelector('.cp-add');
   btn.addEventListener('click', () => {
-    if(isInCart(p.codigo)){
-      removeFromCart(p.codigo);
+    if(isInCart(p.uid)){
+      removeFromCart(p.uid);
       btn.textContent = '+ adicionar';
     } else {
       addToCart(p, 1);
@@ -200,7 +219,7 @@ function aiAddProductCard(p, added){
     }
     refreshSelectionUI();
   });
-  wrap.appendChild(div);
+  wrap.appendChild(row);
   wrap.scrollTop = wrap.scrollHeight;
 }
 
@@ -221,7 +240,8 @@ async function aiHandleUserMessage(text){
   aiShowTyping(false);
   (reply.lines || []).forEach(line => aiAddMessage('ai', line));
   (reply.products || []).forEach(p => {
-    aiAddProductCard(p, (reply.addedCodes || []).includes(p.codigo));
+    const alreadyAdded = (reply.addedUids || []).includes(p.uid) || (reply.addedCodes || []).includes(p.codigo);
+    aiAddProductCard(p, alreadyAdded);
   });
   refreshSelectionUI();
 }

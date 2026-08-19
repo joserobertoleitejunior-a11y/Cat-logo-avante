@@ -36,8 +36,6 @@ function log(...a){ console.log(...a); }
     const { page, errors } = await newPage({ width: 1200, height: 860 });
     await page.goto('http://localhost:8099/catalogo/index.html', { waitUntil: 'networkidle' });
     await page.waitForTimeout(500);
-    await page.click('#modeBookBtn'); // default agora é Catálogo Rápido; estes testes exercitam o modo Revista
-    await page.waitForTimeout(400);
 
     const title = await page.title();
     title.includes('AVANTE') ? ok('título correto') : fail('título incorreto: ' + title);
@@ -122,28 +120,26 @@ function log(...a){ console.log(...a); }
       ? ok('link do WhatsApp gerado corretamente: ' + opened[0].slice(0,80)+'...')
       : fail('link do WhatsApp incorreto: ' + JSON.stringify(opened));
 
-    // TOC
+    // TOC + busca de produto (substitui o Catálogo Rápido, que não existe mais —
+    // a Revista é o único modo do site)
     await page.click('#tocBtn');
     await page.waitForTimeout(300);
     const tocOpen = await page.evaluate(() => document.getElementById('tocDrawer').classList.contains('open'));
     tocOpen ? ok('índice abriu') : fail('índice não abriu');
-    const tocItems = await page.evaluate(() => document.querySelectorAll('.toc-item').length);
+    const tocItems = await page.evaluate(() => document.querySelectorAll('#tocList .toc-item').length);
     tocItems > 10 ? ok('índice populado: ' + tocItems + ' itens') : fail('índice com poucos itens: ' + tocItems);
-    await page.click('.btn-x[data-close-drawer="tocDrawer"]');
 
-    // Catálogo Rápido
-    await page.click('#modeFastBtn');
+    await page.fill('#tocSearch', 'casaredo');
     await page.waitForTimeout(300);
-    const cards = await page.evaluate(() => document.querySelectorAll('.card').length);
-    cards > 100 ? ok('catálogo rápido com ' + cards + ' cards') : fail('poucos cards no catálogo rápido: ' + cards);
-    await page.fill('#fastSearch', 'casaredo');
-    await page.waitForTimeout(300);
-    const filteredCards = await page.evaluate(() => document.querySelectorAll('.card').length);
-    (filteredCards > 0 && filteredCards < cards) ? ok('busca no catálogo rápido filtrou: ' + filteredCards) : fail('busca não filtrou corretamente: ' + filteredCards);
+    const listHidden = await page.evaluate(() => document.getElementById('tocList').style.display === 'none');
+    const results = await page.evaluate(() => document.querySelectorAll('#tocSearchResults .toc-item').length);
+    (listHidden && results > 0) ? ok('busca no índice filtrou: ' + results + ' resultado(s)') : fail('busca no índice não filtrou corretamente: results=' + results);
 
-    await page.screenshot({ path: '/home/claude/avante/revista2/_shot_desktop_fast.png' });
-    await page.click('#modeBookBtn');
-    await page.waitForTimeout(300);
+    await page.click('#tocSearchResults .toc-item');
+    await page.waitForTimeout(500);
+    const tocClosedAfterClick = await page.evaluate(() => !document.getElementById('tocDrawer').classList.contains('open'));
+    tocClosedAfterClick ? ok('clique no resultado da busca fechou o índice e navegou') : fail('índice não fechou após clicar num resultado');
+
     await page.screenshot({ path: '/home/claude/avante/revista2/_shot_desktop_book.png' });
 
     if(errors.length){ errors.forEach(e=>fail('JS error desktop: '+e)); } else { ok('nenhum erro JS no fluxo desktop'); }
@@ -155,8 +151,6 @@ function log(...a){ console.log(...a); }
     const { page, errors } = await newPage({ width: 1000, height: 800 });
     await page.goto('http://localhost:8099/catalogo/index.html', { waitUntil: 'networkidle' });
     await page.waitForTimeout(500);
-    await page.click('#modeBookBtn'); // default agora é Catálogo Rápido; estes testes exercitam o modo Revista
-    await page.waitForTimeout(400);
 
     const bookBox = await page.locator('#book').boundingBox();
     const startX = bookBox.x + bookBox.width*0.8;
@@ -195,16 +189,10 @@ function log(...a){ console.log(...a); }
     const { page, errors } = await newPage({ width: 390, height: 780 });
     await page.goto('http://localhost:8099/catalogo/index.html', { waitUntil: 'networkidle' });
     await page.waitForTimeout(600);
-    await page.click('#modeBookBtn'); // default agora é Catálogo Rápido; este teste checa o modo Revista
-    await page.waitForTimeout(400);
     await page.screenshot({ path: '/home/claude/avante/revista2/_shot_mobile_book.png' });
 
     const bookBox = await page.locator('#book').boundingBox();
     (bookBox.width <= 390 && bookBox.height <= 780) ? ok(`livro cabe na tela mobile (${Math.round(bookBox.width)}x${Math.round(bookBox.height)})`) : fail(`livro fora da tela mobile: ${JSON.stringify(bookBox)}`);
-
-    await page.click('#modeFastBtn');
-    await page.waitForTimeout(400);
-    await page.screenshot({ path: '/home/claude/avante/revista2/_shot_mobile_fast.png' });
 
     if(errors.length){ errors.forEach(e=>fail('JS error mobile: '+e)); } else { ok('nenhum erro JS no mobile'); }
     await page.close();

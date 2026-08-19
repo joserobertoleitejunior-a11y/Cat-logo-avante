@@ -94,7 +94,7 @@
   tbody tr{ animation:rowIn .3s ease both; animation-delay:var(--row-delay,0ms); }
   @keyframes rowIn{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion: reduce){
-    .view.active, .kpi-card, .login-card, tbody tr{ animation:none!important; }
+    .view.active, .kpi-card, .login-card, tbody tr, .coach-msg, .coach-msg-row, .coach-typing span{ animation:none!important; }
   }
 
   /* ---------- Dashboard ---------- */
@@ -119,7 +119,7 @@
   .col h4 span.count{ background:rgba(128,128,128,.18); border-radius:20px; padding:1px 8px; color:var(--txt); }
   .card{
     background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:8px;
-    cursor:pointer; transition:.15s;
+    cursor:pointer; transition:border-color .15s, transform .15s;
   }
   .card:hover{ border-color:var(--gold); transform:translateY(-1px); }
   .card .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:6px; }
@@ -190,9 +190,23 @@
   /* ---------- IA Coach ---------- */
   .coach-wrap{ display:flex; flex-direction:column; height:min(560px,70vh); background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; max-width:640px; }
   .coach-body{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
-  .coach-msg{ max-width:82%; padding:10px 13px; border-radius:13px; font-size:13px; line-height:1.45; }
+  .coach-msg-row{ display:flex; gap:8px; align-items:flex-end; align-self:flex-start; max-width:88%; animation:msgIn .3s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes msgIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  .coach-avatar{
+    width:24px; height:24px; border-radius:50%; flex:0 0 auto; margin-bottom:2px;
+    background:linear-gradient(135deg,var(--navy),var(--navy2)); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px;
+  }
+  .coach-msg{ max-width:82%; padding:10px 13px; border-radius:13px; font-size:13px; line-height:1.45; animation:msgIn .3s cubic-bezier(.16,1,.3,1) both; }
+  .coach-msg-row .coach-msg{ max-width:100%; }
   .coach-msg.bot{ align-self:flex-start; background:var(--panel2); border:1px solid var(--line); border-bottom-left-radius:4px; }
   .coach-msg.me{ align-self:flex-end; background:linear-gradient(135deg,var(--gold),#f6c863); color:#3a2a00; border-bottom-right-radius:4px; font-weight:600; }
+  .coach-typing{ display:none; gap:4px; padding:0 16px 8px; align-items:center; }
+  .coach-typing.show{ display:flex; }
+  .coach-typing span{ width:6px; height:6px; border-radius:50%; background:var(--sub); opacity:.5; animation:coachBounce 1s infinite; }
+  .coach-typing span:nth-child(2){ animation-delay:.15s; }
+  .coach-typing span:nth-child(3){ animation-delay:.3s; }
+  @keyframes coachBounce{ 0%,60%,100%{ transform:translateY(0); } 30%{ transform:translateY(-5px); } }
   .coach-quick{ display:flex; gap:7px; padding:0 14px 10px; flex-wrap:wrap; }
   .coach-quick button{ background:var(--panel2); border:1px solid var(--line); color:var(--txt); border-radius:999px; padding:6px 12px; font-size:11.5px; cursor:pointer; }
   .coach-input-row{ display:flex; gap:8px; padding:12px 14px; border-top:1px solid var(--line); }
@@ -210,11 +224,11 @@
   .channel-card p{ font-size:12px; color:var(--sub); line-height:1.5; }
 
   /* ---------- Contact drawer ---------- */
-  #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:.25s; z-index:80; }
+  #overlay{ position:fixed; inset:0; background:rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity .25s; z-index:80; }
   #overlay.show{ opacity:1; pointer-events:auto; }
   #drawer{
     position:fixed; top:0; right:0; bottom:0; width:420px; max-width:92vw; background:var(--panel);
-    box-shadow:-14px 0 40px rgba(0,0,0,.5); transform:translateX(100%); transition:.3s ease; z-index:90;
+    box-shadow:-14px 0 40px rgba(0,0,0,.5); transform:translateX(100%); transition:transform .3s ease; z-index:90;
     display:flex; flex-direction:column;
   }
   #drawer.open{ transform:translateX(0); }
@@ -400,6 +414,7 @@
       <h2 class="view-title">IA Coach de Vendas<span class="sub">Orientação interna pra equipe — diferente da Ana, que fala com o cliente no catálogo</span></h2>
       <div class="coach-wrap">
         <div class="coach-body" id="coachBody"></div>
+        <div class="coach-typing" id="coachTyping"><span></span><span></span><span></span></div>
         <div class="coach-quick" id="coachQuick"></div>
         <form class="coach-input-row" id="coachForm">
           <input id="coachInput" type="text" placeholder="Pergunta pro coach... ex: cliente disse que tá caro" autocomplete="off">
@@ -898,10 +913,28 @@ const COACH_TOPICS = {
 };
 function coachAddMsg(role, text){
   const body = document.getElementById('coachBody');
-  const div = document.createElement('div');
-  div.className = 'coach-msg ' + (role==='me' ? 'me' : 'bot');
-  div.textContent = text;
-  body.appendChild(div);
+  const bubble = document.createElement('div');
+  bubble.className = 'coach-msg ' + (role==='me' ? 'me' : 'bot');
+  bubble.textContent = text;
+  if(role === 'me'){
+    body.appendChild(bubble);
+  } else {
+    // resposta do coach ganha avatarzinho ao lado — o vendedor não precisa de um pra si
+    const row = document.createElement('div');
+    row.className = 'coach-msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'coach-avatar';
+    avatar.textContent = 'C';
+    avatar.setAttribute('aria-hidden', 'true');
+    row.append(avatar, bubble);
+    body.appendChild(row);
+  }
+  body.scrollTop = body.scrollHeight;
+}
+function coachShowTyping(on){
+  const el = document.getElementById('coachTyping');
+  el.classList.toggle('show', on);
+  const body = document.getElementById('coachBody');
   body.scrollTop = body.scrollHeight;
 }
 function coachNormalize(s){ return (s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').trim(); }
@@ -923,7 +956,8 @@ document.getElementById('coachForm').addEventListener('submit', (e)=>{
   if(!text) return;
   coachAddMsg('me', text);
   input.value = '';
-  setTimeout(()=>coachAddMsg('bot', coachReply(text)), 400);
+  coachShowTyping(true);
+  setTimeout(()=>{ coachShowTyping(false); coachAddMsg('bot', coachReply(text)); }, 500);
 });
 function buildCoachQuick(){
   const quick = document.getElementById('coachQuick');
@@ -933,7 +967,8 @@ function buildCoachQuick(){
     btn.textContent = k;
     btn.addEventListener('click', ()=>{
       coachAddMsg('me', k);
-      setTimeout(()=>coachAddMsg('bot', COACH_TOPICS[k]), 350);
+      coachShowTyping(true);
+      setTimeout(()=>{ coachShowTyping(false); coachAddMsg('bot', COACH_TOPICS[k]); }, 450);
     });
     quick.appendChild(btn);
   });

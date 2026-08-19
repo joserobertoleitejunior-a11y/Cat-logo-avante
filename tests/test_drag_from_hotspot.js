@@ -6,9 +6,6 @@ const { chromium } = require('playwright');
   page.on('pageerror', e=>console.log('PAGEERROR', e.message));
   await page.goto('http://localhost:8099/catalogo/index.html', {waitUntil:'networkidle'});
   await page.waitForTimeout(500);
-  // default agora é Catálogo Rápido; este teste exercita o modo Revista (hotspots da página escaneada)
-  await page.click('#modeBookBtn');
-  await page.waitForTimeout(400);
 
   // vai pra página 3 (Casaredo), que tem vários hotspots cobrindo boa parte da página
   await page.fill('#searchTop', '3');
