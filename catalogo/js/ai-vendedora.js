@@ -168,15 +168,33 @@ async function aiGetResponse(text){
 // ============ UI DO CHAT ============
 function aiAddMessage(role, text){
   const wrap = document.getElementById('aiMessages');
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.textContent = text;
-  wrap.appendChild(div);
+  const bubble = document.createElement('div');
+  bubble.className = 'msg ' + role;
+  bubble.textContent = text;
+  if(role === 'ai'){
+    // mensagens da Ana ganham avatarzinho ao lado da bolha — o cliente não precisa de um pra si
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'msg-avatar';
+    avatar.textContent = 'A';
+    avatar.setAttribute('aria-hidden', 'true');
+    row.append(avatar, bubble);
+    wrap.appendChild(row);
+  } else {
+    wrap.appendChild(bubble);
+  }
   wrap.scrollTop = wrap.scrollHeight;
 }
 
 function aiAddProductCard(p, added){
   const wrap = document.getElementById('aiMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = 'A';
+  avatar.setAttribute('aria-hidden', 'true');
   const div = document.createElement('div');
   div.className = 'msg ai chat-product';
   const displayName = (typeof prettyName === 'function') ? prettyName(p.name) : p.name;
@@ -187,6 +205,7 @@ function aiAddProductCard(p, added){
       <div class="cp-meta">${p.caixa || ''}</div>
       <button class="btn-sm primary cp-add">${added ? '✓ adicionado' : '+ adicionar'}</button>
     </div>`;
+  row.append(avatar, div);
   const btn = div.querySelector('.cp-add');
   btn.addEventListener('click', () => {
     if(isInCart(p.uid)){
@@ -200,7 +219,7 @@ function aiAddProductCard(p, added){
     }
     refreshSelectionUI();
   });
-  wrap.appendChild(div);
+  wrap.appendChild(row);
   wrap.scrollTop = wrap.scrollHeight;
 }
 
