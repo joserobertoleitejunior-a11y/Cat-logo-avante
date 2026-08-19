@@ -130,7 +130,7 @@ function aiLocalEngine(text){
     return {
       lines: [aiFill(aiPick(AI_REPLIES.added), { qty, name: top.name })],
       products: [top],
-      addedCodes: [top.codigo]
+      addedUids: [top.uid]
     };
   }
   if(matches.length === 1){
@@ -189,8 +189,8 @@ function aiAddProductCard(p, added){
     </div>`;
   const btn = div.querySelector('.cp-add');
   btn.addEventListener('click', () => {
-    if(isInCart(p.codigo)){
-      removeFromCart(p.codigo);
+    if(isInCart(p.uid)){
+      removeFromCart(p.uid);
       btn.textContent = '+ adicionar';
     } else {
       addToCart(p, 1);
@@ -221,7 +221,8 @@ async function aiHandleUserMessage(text){
   aiShowTyping(false);
   (reply.lines || []).forEach(line => aiAddMessage('ai', line));
   (reply.products || []).forEach(p => {
-    aiAddProductCard(p, (reply.addedCodes || []).includes(p.codigo));
+    const alreadyAdded = (reply.addedUids || []).includes(p.uid) || (reply.addedCodes || []).includes(p.codigo);
+    aiAddProductCard(p, alreadyAdded);
   });
   refreshSelectionUI();
 }

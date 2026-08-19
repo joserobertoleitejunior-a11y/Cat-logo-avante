@@ -118,6 +118,12 @@ async function loadData(){
   // pXXX.jpg foi gerado na MESMA ordem deste array, então o índice aqui é o nome do arquivo.
   PRODUCTS.forEach((p,i) => {
     p.photo = `${ASSET_BASE}images/products/p${String(i).padStart(3,'0')}.jpg`;
+    // identidade interna do produto (carrinho/seleção/hotspot) — o `codigo` (EAN) vem do
+    // catálogo digitalizado e algumas linhas saíram com o MESMO EAN em produtos diferentes
+    // (erro de OCR na digitalização, ex: "Doce de Frutas Goiaba" e "...Banana" com o mesmo
+    // código). Usar o índice como uid evita que selecionar um marque o outro como selecionado
+    // também — o `codigo` continua sendo exibido pro cliente exatamente como veio da fonte.
+    p.uid = String(i);
     (PRODUCTS_BY_PAGE[p.page] = PRODUCTS_BY_PAGE[p.page] || []).push(p);
   });
 }
@@ -188,11 +194,11 @@ function buildHotspots(pageIndex){
   prods.forEach(p => {
     const hs = document.createElement('div');
     hs.className = 'hotspot';
-    hs.dataset.codigo = p.codigo;
+    hs.dataset.uid = p.uid;
     // aplica o estado "selecionado" já na criação (isInCart é barato — olha só o carrinho,
     // não o DOM inteiro). Isso evita ter que re-varrer todos os cards/hotspots da página a
     // cada virada — só o addToCart/removeFromCart precisam disso, quando o carrinho muda de fato.
-    if(isInCart(p.codigo)) hs.classList.add('selected');
+    if(isInCart(p.uid)) hs.classList.add('selected');
     hs.style.left = p.bbox.left_pct + '%';
     hs.style.top = p.bbox.top_pct + '%';
     hs.style.width = p.bbox.width_pct + '%';
@@ -204,7 +210,7 @@ function buildHotspots(pageIndex){
     hs.addEventListener('click', (e)=>{
       if(justDragged) return; // veio de um arrasto que terminou em cima do hotspot, não foi um toque de verdade
       e.stopPropagation();
-      if(isInCart(p.codigo)) removeFromCart(p.codigo);
+      if(isInCart(p.uid)) removeFromCart(p.uid);
       else addToCart(p, 1);
       trackEvent('product_click', {codigo:p.codigo, nome:p.name, origem:'revista'});
     });
@@ -437,7 +443,7 @@ function openProduct(p){
   document.getElementById('productCodigo').textContent = p.codigo;
   document.getElementById('productSecao').textContent = p.section || p.dept || '—';
   document.getElementById('qtyVal').textContent = currentQty;
-  const existing = CART.find(c => c.codigo === p.codigo);
+  const existing = CART.find(c => c.uid === p.uid);
   const note = document.getElementById('productInCartNote');
   note.classList.toggle('show', !!existing);
   if(existing) document.getElementById('productInCartQty').textContent = existing.qtd;
@@ -457,27 +463,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 // ============ CARRINHO / ORÇAMENTO ============
-function isInCart(codigo){ return CART.some(c => c.codigo === codigo); }
+// isInCart/addToCart/removeFromCart identificam o item pelo `uid` interno (ver loadData),
+// não pelo `codigo` (EAN) — alguns produtos vieram do catálogo digitalizado com o MESMO EAN
+// por erro de OCR (ex: "Doce de Frutas Goiaba" e "...Banana"), e usar `codigo` aqui faria
+// selecionar um item marcar o outro como selecionado também.
+function isInCart(uid){ return CART.some(c => c.uid === uid); }
 
 // Atualiza o selo de "já selecionado" em todo hotspot da revista que corresponde a um
 // item do carrinho — assim o cliente sempre vê, olhando a página, o que já escolheu.
 function refreshSelectionUI(){
-  const inCartCodes = new Set(CART.map(c => c.codigo));
-  document.querySelectorAll('.hotspot[data-codigo]').forEach(hs => {
-    hs.classList.toggle('selected', inCartCodes.has(hs.dataset.codigo));
+  const inCartUids = new Set(CART.map(c => c.uid));
+  document.querySelectorAll('.hotspot[data-uid]').forEach(hs => {
+    hs.classList.toggle('selected', inCartUids.has(hs.dataset.uid));
   });
 }
 
 function addToCart(p, qty){
-  const existing = CART.find(c => c.codigo === p.codigo);
+  const existing = CART.find(c => c.uid === p.uid);
   if(existing){ existing.qtd += qty; }
-  else{ CART.push({ codigo:p.codigo, nome:p.name, caixa:p.caixa, page:p.page, qtd:qty }); }
+  else{ CART.push({ uid:p.uid, codigo:p.codigo, nome:p.name, caixa:p.caixa, page:p.page, qtd:qty }); }
   trackEvent('add_to_quote', { codigo:p.codigo, nome:p.name, qtd:qty });
   renderCartBadge();
   refreshSelectionUI();
 }
-function removeFromCart(codigo){
-  const idx = CART.findIndex(c=>c.codigo===codigo);
+function removeFromCart(uid){
+  const idx = CART.findIndex(c=>c.uid===uid);
   if(idx>-1) CART.splice(idx,1);
   renderCartBadge();
   renderCartDrawer();
@@ -504,10 +514,10 @@ function renderCartDrawer(){
         <div class="ci-name">${c.nome}</div>
         <div class="ci-meta">${c.caixa||''} · ${c.qtd} caixa(s)</div>
       </div>
-      <button class="ci-remove" data-cod="${c.codigo}" aria-label="Remover">✕</button>
+      <button class="ci-remove" data-uid="${c.uid}" aria-label="Remover">✕</button>
     </div>`).join('');
   body.querySelectorAll('.ci-remove').forEach(btn=>{
-    btn.addEventListener('click', ()=>removeFromCart(btn.dataset.cod));
+    btn.addEventListener('click', ()=>removeFromCart(btn.dataset.uid));
   });
 }
 
@@ -668,13 +678,13 @@ function renderTocSearch(q){
     return;
   }
   resEl.innerHTML = results.slice(0, 40).map(p => `
-    <div class="toc-item" data-codigo="${p.codigo}">
+    <div class="toc-item" data-uid="${p.uid}">
       <img src="${p.photo}" alt="${prettyName(p.name)}" loading="lazy">
       <div><div class="ttl">${prettyName(p.name)}</div><div class="sub">${p.brand?p.brand+' · ':''}pág. ${p.page}</div></div>
     </div>`).join('');
   resEl.querySelectorAll('.toc-item').forEach(el => {
     el.addEventListener('click', () => {
-      const p = PRODUCTS.find(x => x.codigo === el.dataset.codigo);
+      const p = PRODUCTS.find(x => x.uid === el.dataset.uid);
       if(p) goTo(p.page);
       closeDrawer('tocDrawer');
     });

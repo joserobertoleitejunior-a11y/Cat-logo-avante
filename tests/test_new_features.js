@@ -27,15 +27,15 @@ function log(...a){ console.log(...a); }
   await page.waitForTimeout(700);
 
   const firstHotspot = page.locator('.leaf.in-window.active .hotspot').first();
-  const cod = await firstHotspot.getAttribute('data-codigo');
-  ok('primeiro hotspot visível tem data-codigo: ' + cod);
+  const uid = await firstHotspot.getAttribute('data-uid');
+  ok('primeiro hotspot visível tem data-uid: ' + uid);
 
-  let selectedBefore = await page.evaluate((c) => document.querySelector(`.hotspot[data-codigo="${c}"]`).classList.contains('selected'), cod);
+  let selectedBefore = await page.evaluate((u) => document.querySelector(`.hotspot[data-uid="${u}"]`).classList.contains('selected'), uid);
   selectedBefore === false ? ok('hotspot começa não-selecionado') : fail('hotspot já começa selecionado (inesperado)');
 
   await firstHotspot.click();
   await page.waitForTimeout(200);
-  let selectedAfter = await page.evaluate((c) => document.querySelector(`.hotspot[data-codigo="${c}"]`).classList.contains('selected'), cod);
+  let selectedAfter = await page.evaluate((u) => document.querySelector(`.hotspot[data-uid="${u}"]`).classList.contains('selected'), uid);
   selectedAfter === true ? ok('um toque seleciona o hotspot (selo de check aparece)') : fail('hotspot não ficou selecionado após o toque');
 
   const cartCountAfterSelect = await page.textContent('#cartCount');
@@ -44,20 +44,20 @@ function log(...a){ console.log(...a); }
   // toca de novo — deve desselecionar (toggle)
   await firstHotspot.click();
   await page.waitForTimeout(200);
-  let selectedToggleOff = await page.evaluate((c) => document.querySelector(`.hotspot[data-codigo="${c}"]`).classList.contains('selected'), cod);
+  let selectedToggleOff = await page.evaluate((u) => document.querySelector(`.hotspot[data-uid="${u}"]`).classList.contains('selected'), uid);
   selectedToggleOff === false ? ok('segundo toque desseleciona (toggle completo)') : fail('não desselecionou no segundo toque');
   await firstHotspot.click(); // seleciona de novo, pro resto do teste
 
   // ---------- BUSCA NO ÍNDICE LEVA ATÉ O PRODUTO ----------
-  const prodName = await page.evaluate((c) => {
-    const p = PRODUCTS.find(x => x.codigo === c);
+  const prodName = await page.evaluate((u) => {
+    const p = PRODUCTS.find(x => x.uid === u);
     return p ? p.name : null;
-  }, cod);
+  }, uid);
   await page.click('#tocBtn');
   await page.waitForTimeout(200);
   await page.fill('#tocSearch', prodName.split(' ')[0]);
   await page.waitForTimeout(300);
-  const searchHasResult = await page.evaluate((c) => !!document.querySelector(`#tocSearchResults .toc-item[data-codigo="${c}"]`), cod);
+  const searchHasResult = await page.evaluate((u) => !!document.querySelector(`#tocSearchResults .toc-item[data-uid="${u}"]`), uid);
   searchHasResult ? ok('busca no índice encontra o produto pelo nome') : fail('busca no índice não encontrou o produto: ' + prodName);
   await page.click('.btn-x[data-close-drawer="tocDrawer"]');
 
