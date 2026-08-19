@@ -785,6 +785,62 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if(catalogoLink) catalogoLink.addEventListener('click', (e)=>{ e.preventDefault(); closeMenu(); });
 });
 
+// ============ LOGO DO HEADER — reage ao gesto de puxar a tela ============
+// Dois efeitos, sem NUNCA chamar preventDefault (tudo passive:true) — assim nunca
+// disputa com o "puxar pra atualizar" nativo do navegador nem com o arrasto de
+// virar página da revista (que escuta pointer events só dentro de #book, não na
+// window inteira):
+//  1. rolando a página (mouse/trackpad no PC, dedo no celular) o logo encolhe
+//     bem suavemente — dá vida ao header sem chamar atenção demais.
+//  2. no touch, se o dedo continuar puxando pra baixo depois de já estar no topo
+//     (o gesto clássico de "pull to refresh"), o logo estica e "respinga" de
+//     volta ao soltar — é só um floreio visual, o navegador decide sozinho se
+//     recarrega a página ou não.
+(function headerParallax(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const logo = document.querySelector('.brand-logo');
+  if(!logo) return;
+
+  function scrollTopNow(){ return (document.scrollingElement || document.body).scrollTop; }
+
+  let pulling = false, startY = 0, scrollRaf = null;
+
+  function applyScrollParallax(){
+    if(pulling) return; // o gesto de puxar manda mais que o scroll normal enquanto ativo
+    const y = Math.min(scrollTopNow(), 60);
+    logo.style.transform = y ? `scale(${(1 - y/700).toFixed(3)})` : '';
+  }
+  window.addEventListener('scroll', () => {
+    if(scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => { applyScrollParallax(); scrollRaf = null; });
+  }, { passive: true });
+
+  window.addEventListener('touchstart', (e) => {
+    if(scrollTopNow() > 0) return; // só conta como "puxar" se já estiver no topo
+    pulling = true;
+    startY = e.touches[0].clientY;
+    logo.style.transition = 'none';
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if(!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if(dy <= 0){ logo.style.transform = ''; return; }
+    const clamped = Math.min(dy, 70);
+    logo.style.transform = `translateY(${(clamped * 0.35).toFixed(1)}px) scale(${(1 + clamped/220).toFixed(3)})`;
+  }, { passive: true });
+
+  function releasePull(){
+    if(!pulling) return;
+    pulling = false;
+    logo.style.transition = 'transform .45s cubic-bezier(.34,1.56,.64,1)'; // spring — o "respingo" ao soltar
+    logo.style.transform = '';
+    setTimeout(() => { logo.style.transition = ''; }, 460);
+  }
+  window.addEventListener('touchend', releasePull, { passive: true });
+  window.addEventListener('touchcancel', releasePull, { passive: true });
+})();
+
 // hook leve só pra QA/teste automatizado acompanhar o estado da animação sem mexer na UX
 window.__isFlipping = () => flipLock;
 window.__getCurrent = () => current;

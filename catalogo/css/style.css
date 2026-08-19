@@ -119,7 +119,10 @@ header{
   flex-wrap:wrap;
 }
 .brand{ display:flex; align-items:center; gap:11px; }
-.brand-logo{ display:block; height:30px; width:auto; flex:0 0 auto; }
+/* transform-origin embaixo à esquerda — o logo "cresce" a partir do canto onde
+   fica ancorado no header, em vez de esticar pro centro (ficaria estranho ao lado
+   do botão de menu). O JS (headerParallax, no fim de app.js) só seta transform. */
+.brand-logo{ display:block; height:30px; width:auto; flex:0 0 auto; transform-origin:left center; will-change:transform; }
 .brand-sub{
   font-family:var(--font-body); font-weight:600; color:var(--sub); font-size:10.5px; letter-spacing:.6px;
   text-transform:uppercase; white-space:nowrap; align-self:center;
