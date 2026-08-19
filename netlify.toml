@@ -2,7 +2,7 @@
   # Site 100% estático, sem build step.
   # IMPORTANTE: publish é a RAIZ do repositório, não "catalogo/".
   # catalogo/index.html referencia CSS/JS/imagens por caminho absoluto
-  # (ex: /catalogo/css/style.css, /shared/pin-gate.js) — se o publish
+  # (ex: /catalogo/css/style.css) — se o publish
   # directory for "catalogo", a pasta shared/ fica fora do site e o
   # PIN gate quebra. Ver DEPLOY-VERCEL.md para o histórico desse bug.
   publish = "."

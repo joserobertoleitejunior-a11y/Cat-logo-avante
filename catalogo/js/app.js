@@ -22,6 +22,11 @@ function getWhatsAppNumber(){
   const cfg = getSiteCfg();
   return (cfg.whatsapp && /^\d{10,13}$/.test(cfg.whatsapp)) ? cfg.whatsapp : WHATSAPP_NUMBER;
 }
+const AI_NAME_DEFAULT = 'Atendente Avante';
+function getAiName(){
+  const cfg = getSiteCfg();
+  return (cfg.aiName && cfg.aiName.trim()) ? cfg.aiName.trim() : AI_NAME_DEFAULT;
+}
 const GA4_MEASUREMENT_ID = ''; // TODO: colar o ID do Google Analytics 4 (ex: G-XXXXXXX) para ativar
 // TODO fase 2: quando a function do backend (backend/functions/ai-vendedora.js) estiver publicada,
 // colar a URL aqui. Com isso vazio, o chat usa o motor local (js/ai-vendedora.js) — funciona sem

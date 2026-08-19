@@ -19,24 +19,13 @@ Depois de publicado, o link vai ficar mais ou menos assim:
 `https://SEU-PROJETO.vercel.app/catalogo/` → catálogo digital (o que o cliente vê)
 `https://SEU-PROJETO.vercel.app/crm/crm_dashboard.html` → painel admin (só pra vocês)
 
-## 2. PIN de acesso (proteção de demo)
+## 2. Acesso
 
-Pra ninguém cair na demo por acaso antes da hora, o catálogo e o admin pedem um
-código de 4 dígitos antes de mostrar qualquer coisa: **4546**
+O catálogo é público — sem senha, sem PIN. Só o painel admin pede login (a
+pasta `shared/` e o PIN de demonstração foram removidos quando o projeto foi
+pro ar de verdade).
 
-- Liberar um libera o outro também (mesmo link/domínio).
-- Quer mandar um link que já entra sozinho pro cliente, sem ele digitar nada?
-  Manda assim: `https://SEU-PROJETO.vercel.app/catalogo/?pin=4546`
-- Pra trocar o PIN: abra `shared/pin-gate.js`, linha `var PIN = '4546';`, troque
-  o número e suba de novo.
-
-**Importante:** isso é só uma cortina simples pra demo, não é segurança de
-verdade (o código fica visível pra quem abrir o "ver código-fonte" da página).
-Quando o projeto for pra produção com domínio final, é só apagar as duas tags
-`<script src="/shared/pin-gate.js"></script>` (uma no `catalogo/index.html`,
-outra no `crm/crm_dashboard.html`) e a pasta `shared/` inteira.
-
-## 3. Login do painel admin (depois de passar o PIN)
+## 3. Login do painel admin
 
 Ainda é só front-end (sem backend real por trás), então serve pra demonstração,
 não pra dado sensível de verdade:

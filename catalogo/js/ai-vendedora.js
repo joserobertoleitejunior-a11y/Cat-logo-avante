@@ -172,12 +172,12 @@ function aiAddMessage(role, text){
   bubble.className = 'msg ' + role;
   bubble.textContent = text;
   if(role === 'ai'){
-    // mensagens da Ana ganham avatarzinho ao lado da bolha — o cliente não precisa de um pra si
+    // mensagens da atendente ganham avatarzinho ao lado da bolha — o cliente não precisa de um pra si
     const row = document.createElement('div');
     row.className = 'msg-row';
     const avatar = document.createElement('div');
     avatar.className = 'msg-avatar';
-    avatar.textContent = 'A';
+    avatar.textContent = AI_AVATAR_LETTER;
     avatar.setAttribute('aria-hidden', 'true');
     row.append(avatar, bubble);
     wrap.appendChild(row);
@@ -193,7 +193,7 @@ function aiAddProductCard(p, added){
   row.className = 'msg-row';
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  avatar.textContent = 'A';
+  avatar.textContent = AI_AVATAR_LETTER;
   avatar.setAttribute('aria-hidden', 'true');
   const div = document.createElement('div');
   div.className = 'msg ai chat-product';
@@ -246,12 +246,27 @@ async function aiHandleUserMessage(text){
   refreshSelectionUI();
 }
 
+// letra do avatar (bolha redonda com uma letra) — sempre a primeira letra do
+// nome configurado no admin (Config > Nome da vendedora IA), "Atendente Avante"
+// por padrão. Lido uma vez e reusado nas bolhas de mensagem (evita chamar
+// getAiName()/localStorage a cada mensagem digitada).
+const AI_DISPLAY_NAME = (typeof getAiName === 'function') ? getAiName() : 'Atendente Avante';
+const AI_AVATAR_LETTER = AI_DISPLAY_NAME.trim().charAt(0).toUpperCase() || 'A';
+
 document.addEventListener('DOMContentLoaded', () => {
   const fab = document.getElementById('aiFab');
   const panel = document.getElementById('aiPanel');
   const closeBtn = document.getElementById('aiCloseBtn');
   const form = document.getElementById('aiForm');
   const input = document.getElementById('aiInput');
+
+  const nameEl = document.getElementById('aiNameLabel');
+  const avatarEl = document.getElementById('aiAvatarLetter');
+  const fabLabelEl = document.getElementById('aiFabLabel');
+  if(nameEl) nameEl.textContent = AI_DISPLAY_NAME;
+  if(avatarEl) avatarEl.textContent = AI_AVATAR_LETTER;
+  if(fabLabelEl) fabLabelEl.textContent = 'Fale com a gente';
+  fab.setAttribute('aria-label', 'Falar com a ' + AI_DISPLAY_NAME);
 
   fab.addEventListener('click', () => {
     panel.classList.add('open');

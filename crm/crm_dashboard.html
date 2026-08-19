@@ -255,9 +255,6 @@
 </head>
 <body>
 
-<!-- PIN GATE — só pra deploy de demonstração (Vercel). Ver shared/pin-gate.js.
-     Precisa ser o PRIMEIRO elemento do body: trava tudo, inclusive a tela de login. -->
-<script src="/shared/pin-gate.js"></script>
 
 <!-- ================= LOGIN ================= -->
 <div id="loginScreen">
@@ -411,7 +408,7 @@
 
     <!-- IA COACH -->
     <section id="view-coach" class="view">
-      <h2 class="view-title">IA Coach de Vendas<span class="sub">Orientação interna pra equipe — diferente da Ana, que fala com o cliente no catálogo</span></h2>
+      <h2 class="view-title">IA Coach de Vendas<span class="sub">Orientação interna pra equipe — diferente da Atendente Avante, que fala com o cliente no catálogo</span></h2>
       <div class="coach-wrap">
         <div class="coach-body" id="coachBody"></div>
         <div class="coach-typing" id="coachTyping"><span></span><span></span><span></span></div>
@@ -430,7 +427,7 @@
         <label>Número do WhatsApp de vendas (só números, com DDI+DDD)</label>
         <input id="cfgWhats" placeholder="Ex: 5511945460722">
         <label>Nome da vendedora IA (chat do catálogo)</label>
-        <input id="cfgAiName" placeholder="Ex: Ana">
+        <input id="cfgAiName" placeholder="Ex: Atendente Avante">
         <label>Mensagem de saudação da IA no catálogo</label>
         <textarea id="cfgGreeting" placeholder="Ex: oi, seja bem-vindo à Avante, me conta o que você precisa que eu já separo"></textarea>
         <div class="actions" style="margin-top:16px; display:flex; gap:10px;">
@@ -454,7 +451,7 @@
         </div>
         <div class="channel-card">
           <div class="chead"><div class="ico site">S</div><div><b>Chat do Catálogo (site)</b><br><span class="status-pill on">Ativo</span></div></div>
-          <p>A Ana já responde dentro do próprio catálogo digital, mostra produto com foto na conversa e adiciona ao orçamento automaticamente quando o cliente confirma.</p>
+          <p>A atendente já responde dentro do próprio catálogo digital, mostra produto com foto na conversa e adiciona ao orçamento automaticamente quando o cliente confirma.</p>
         </div>
       </div>
     </section>
@@ -986,7 +983,7 @@ function loadCfgForm(){
   let cfg = {};
   try{ cfg = JSON.parse(localStorage.getItem('avante_site_cfg')||'{}'); }catch(e){}
   document.getElementById('cfgWhats').value = cfg.whatsapp || '5511945460722';
-  document.getElementById('cfgAiName').value = cfg.aiName || 'Ana';
+  document.getElementById('cfgAiName').value = cfg.aiName || 'Atendente Avante';
   document.getElementById('cfgGreeting').value = cfg.greeting || 'oi, seja bem-vindo à Avante, me conta o que você precisa que eu já separo';
 }
 document.getElementById('cfgSaveBtn').addEventListener('click', ()=>{
