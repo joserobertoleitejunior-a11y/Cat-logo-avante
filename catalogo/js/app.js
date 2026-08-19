@@ -638,7 +638,7 @@ const NAME_LOWER_WORDS = new Set(['e','de','da','do','das','dos','com','para','e
 // preço de tabela) grudado no final do próprio campo "nome" — igual ao "Cód: X · Pág. Y"
 // que já tiramos dos cards, isso é numeração/etiqueta de estoque e não pode aparecer pro
 // cliente. Cortamos o nome no primeiro marcador desse tipo, mantendo só a parte do produto.
-const NAME_CODE_CUTOFF = /\b(REF|C[oó]d(?:igo)?|EAN|DUN|Validade|Pre[cç]o\s+Tabela)\b\s*[:.]?/i;
+const NAME_CODE_CUTOFF = /\b(REF|C[oó]d(?:igo)?|EAN|DUN|Validade|Pre[cç]o\s+Tabela|Fra[cç][ãa]o|Ingredientes)\b\s*[:.]?/i;
 function cleanProductName(raw){
   if(!raw) return '';
   const m = NAME_CODE_CUTOFF.exec(raw);
