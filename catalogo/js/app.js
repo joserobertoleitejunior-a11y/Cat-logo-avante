@@ -564,19 +564,59 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(()=>{ btn.disabled = false; btn.textContent = originalLabel; }, 600);
   });
 
+  // ---- chips de dia/período: seleção única por grupo, um toque já marca ----
+  let visitDia = null, visitPeriodo = null;
+  function wireChipGroup(containerId, dataAttr, onPick){
+    const container = document.getElementById(containerId);
+    container.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.day-chip');
+      if(!btn) return;
+      container.querySelectorAll('.day-chip').forEach(c=>c.classList.remove('selected'));
+      btn.classList.add('selected');
+      container.classList.remove('needs-choice');
+      onPick(btn.dataset[dataAttr]);
+    });
+  }
+  wireChipGroup('visitDiaChips', 'day', (v)=>{ visitDia = v; });
+  wireChipGroup('visitPeriodoChips', 'periodo', (v)=>{ visitPeriodo = v; });
+
+  // ---- telefone formata sozinho enquanto digita: (11) 90000-0000 ----
+  document.getElementById('visitTelefone').addEventListener('input', (e)=>{
+    let d = e.target.value.replace(/\D/g,'').slice(0,11);
+    if(d.length > 10) e.target.value = `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+    else if(d.length > 6) e.target.value = `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+    else if(d.length > 2) e.target.value = `(${d.slice(0,2)}) ${d.slice(2)}`;
+    else if(d.length > 0) e.target.value = `(${d}`;
+    else e.target.value = '';
+  });
+
+  function resetVisitForm(){
+    const form = document.getElementById('visitForm');
+    form.reset();
+    form.classList.remove('sent');
+    document.getElementById('visitSuccess').classList.remove('show');
+    document.getElementById('visitSubmitBtn').style.display = '';
+    visitDia = null; visitPeriodo = null;
+    document.querySelectorAll('#visitDiaChips .day-chip, #visitPeriodoChips .day-chip').forEach(c=>c.classList.remove('selected'));
+  }
   document.getElementById('visitBtn').addEventListener('click', ()=>{
-    document.getElementById('visitSentNote').style.display = 'none';
-    document.getElementById('visitSubmitBtn').style.display = 'block';
+    resetVisitForm();
     openDrawer('visitDrawer');
   });
   document.getElementById('visitForm').addEventListener('submit', (e)=>{
     e.preventDefault();
+    if(!visitDia){
+      document.getElementById('visitDiaChips').classList.add('needs-choice');
+      document.getElementById('visitDiaChips').scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
     const pedido = {
       nome: document.getElementById('visitNome').value.trim(),
       empresa: document.getElementById('visitEmpresa').value.trim(),
       cidade: document.getElementById('visitCidade').value.trim(),
       telefone: document.getElementById('visitTelefone').value.trim(),
-      dia: document.getElementById('visitDia').value,
+      dia: visitDia,
+      periodo: visitPeriodo || 'Qualquer',
       pedidoEm: new Date().toISOString(),
       status: 'pendente',
     };
@@ -589,10 +629,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       list.push(pedido);
       localStorage.setItem('avante_visit_requests', JSON.stringify(list));
     }catch(err){ console.debug('[visita] não deu pra salvar localmente', err); }
-    trackEvent('visit_requested', { cidade: pedido.cidade, dia: pedido.dia });
-    document.getElementById('visitSentNote').style.display = 'block';
+    trackEvent('visit_requested', { cidade: pedido.cidade, dia: pedido.dia, periodo: pedido.periodo });
     document.getElementById('visitSubmitBtn').style.display = 'none';
-    document.getElementById('visitForm').reset();
+    document.getElementById('visitSuccess').classList.add('show');
   });
 });
 

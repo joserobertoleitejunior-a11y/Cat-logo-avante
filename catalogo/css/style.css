@@ -69,11 +69,10 @@ html[data-theme="dark"] .skel{
   background:linear-gradient(100deg, #1C2531 8%, #232E3D 18%, #1C2531 33%);
   background-size:200% 100%;
 }
-html[data-theme="dark"] .toolbar input,
 html[data-theme="dark"] #leadForm input,
-html[data-theme="dark"] #searchTop{ background:var(--paper); color:var(--ink); }
-html[data-theme="dark"] .chip.active,
-html[data-theme="dark"] nav.mode-toggle button.active{ color:#241a00; }
+html[data-theme="dark"] #searchTop,
+html[data-theme="dark"] .field-ico,
+html[data-theme="dark"] .day-chip{ background:var(--paper); color:var(--ink); }
 html[data-theme="dark"] ::selection{ background:rgba(232,174,48,.35); }
 html[data-theme="dark"] #themeBtn .ico-sun{ display:none; }
 html[data-theme="dark"] #themeBtn .ico-moon{ display:inline-flex; }
@@ -407,6 +406,48 @@ main{ max-width:1400px; margin:0 auto; }
   transition:border-color .16s, box-shadow .16s;
 }
 #leadForm input:focus{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); outline:none; }
+
+/* ---------- Pedir visita (formulário interativo) ---------- */
+.visit-form{ padding:6px; }
+.visit-intro{ font-size:12.5px; color:var(--sub); line-height:1.6; margin:0 0 16px; }
+.field-ico{
+  display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:11px;
+  padding:0 13px; margin-bottom:10px; background:#fff; color:var(--sub);
+  transition:border-color .16s var(--ease), box-shadow .16s var(--ease);
+}
+.field-ico:focus-within{ border-color:var(--gold-deep); box-shadow:0 0 0 3px rgba(232,174,48,.16); }
+.field-ico svg{ flex:0 0 auto; }
+.field-ico input{
+  flex:1; min-width:0; border:none; background:transparent; padding:11px 0; font-size:13.5px;
+  color:var(--ink); font-family:var(--font-body);
+}
+.field-ico input:focus{ outline:none; }
+.visit-field-label{ font-size:11.5px; color:var(--sub); font-weight:700; margin:16px 0 8px; }
+.chip-picker{ display:flex; gap:7px; flex-wrap:wrap; }
+.day-chip{
+  border:1px solid var(--line); background:#fff; color:var(--text-navy); border-radius:10px;
+  padding:9px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:var(--font-body);
+  transition:transform .14s var(--ease), box-shadow .14s var(--ease), background .14s var(--ease), border-color .14s var(--ease);
+}
+.day-chip:hover{ transform:translateY(-1px); border-color:rgba(198,137,15,.4); }
+.day-chip.selected{
+  background:linear-gradient(135deg,var(--gold),#F6C863); border-color:transparent; color:#3a2a00;
+  box-shadow:var(--shadow-gold);
+}
+/* estado de erro (tocou "Pedir visita" sem escolher) — some sozinho assim que o
+   cliente escolhe uma opção, ver JS. */
+.chip-picker.needs-choice .day-chip{ border-color:rgba(214,58,46,.5); }
+
+.visit-success{ display:none; flex-direction:column; align-items:center; text-align:center; padding:26px 10px 6px; }
+.visit-success.show{ display:flex; }
+.visit-success-check{
+  width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#4ADE80,#22c55e);
+  display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+  box-shadow:0 10px 24px rgba(34,197,94,.35);
+  animation:visitCheckIn .45s var(--ease) both;
+}
+@keyframes visitCheckIn{ from{ opacity:0; transform:scale(.6); } to{ opacity:1; transform:none; } }
+.visit-success-text{ font-size:13.5px; color:var(--ink); line-height:1.6; }
 
 /* rótulo de texto dos botões flutuantes — encolhe pra ícone só em telas estreitas (ver media query) */
 .fab-label{ white-space:nowrap; }

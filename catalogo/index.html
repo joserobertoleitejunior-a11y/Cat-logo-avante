@@ -254,29 +254,50 @@
 <div id="visitDrawer" class="drawer">
   <div class="drawer-head"><h3>Pedir visita de um consultor</h3><button class="btn-x" data-close-drawer="visitDrawer">✕</button></div>
   <div class="drawer-body">
-    <form id="visitForm" style="padding:6px;">
-      <p style="font-size:12.5px; color:var(--sub);">Preenche rapidinho e um consultor da Avante entra em contato pra combinar o melhor dia:</p>
-      <label for="visitNome">Seu nome</label>
-      <input id="visitNome" required placeholder="Ex: Marcos Silva">
-      <label for="visitEmpresa">Empresa / loja</label>
-      <input id="visitEmpresa" required placeholder="Ex: Mercadinho Bela Vista">
-      <label for="visitCidade">Cidade</label>
-      <input id="visitCidade" required placeholder="Ex: Campo Limpo Paulista">
-      <label for="visitTelefone">Telefone / WhatsApp</label>
-      <input id="visitTelefone" required placeholder="(11) 90000-0000">
-      <label for="visitDia">Melhor dia pra visita</label>
-      <select id="visitDia" required>
-        <option value="">Escolha um dia...</option>
-        <option value="Segunda">Segunda-feira</option>
-        <option value="Terça">Terça-feira</option>
-        <option value="Quarta">Quarta-feira</option>
-        <option value="Quinta">Quinta-feira</option>
-        <option value="Sexta">Sexta-feira</option>
-      </select>
-      <div id="visitSentNote" style="display:none; margin-top:16px; padding:12px 14px; background:var(--cream2); border-radius:12px; font-size:12.5px; color:var(--ink);">
-        ✓ Pedido enviado! Um consultor da Avante vai te chamar no WhatsApp pra confirmar o dia e horário.
+    <form id="visitForm" class="visit-form">
+      <p class="visit-intro">Preenche rapidinho e um consultor da Avante entra em contato pra combinar o melhor dia:</p>
+
+      <label class="field-ico" for="visitNome">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-3.6 4.4-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg>
+        <input id="visitNome" required placeholder="Seu nome">
+      </label>
+      <label class="field-ico" for="visitEmpresa">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg>
+        <input id="visitEmpresa" required placeholder="Empresa / loja">
+      </label>
+      <label class="field-ico" for="visitCidade">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.6 7-11.7A7 7 0 0 0 5 9.3C5 14.4 12 21 12 21z"/><circle cx="12" cy="9.3" r="2.4"/></svg>
+        <input id="visitCidade" required placeholder="Cidade">
+      </label>
+      <label class="field-ico" for="visitTelefone">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2C9.5 21 3 14.5 3 6a2 2 0 0 1 1-2z"/></svg>
+        <input id="visitTelefone" type="tel" inputmode="numeric" required placeholder="(11) 90000-0000">
+      </label>
+
+      <div class="visit-field-label">Melhor dia pra visita</div>
+      <div class="chip-picker" id="visitDiaChips" role="radiogroup" aria-label="Melhor dia pra visita">
+        <button type="button" class="day-chip" data-day="Segunda">Seg</button>
+        <button type="button" class="day-chip" data-day="Terça">Ter</button>
+        <button type="button" class="day-chip" data-day="Quarta">Qua</button>
+        <button type="button" class="day-chip" data-day="Quinta">Qui</button>
+        <button type="button" class="day-chip" data-day="Sexta">Sex</button>
       </div>
-      <button class="btn-primary" type="submit" id="visitSubmitBtn" style="margin-top:18px;">Pedir visita →</button>
+
+      <div class="visit-field-label">Melhor período</div>
+      <div class="chip-picker" id="visitPeriodoChips" role="radiogroup" aria-label="Melhor período">
+        <button type="button" class="day-chip" data-periodo="Manhã">Manhã</button>
+        <button type="button" class="day-chip" data-periodo="Tarde">Tarde</button>
+        <button type="button" class="day-chip" data-periodo="Qualquer">Qualquer</button>
+      </div>
+
+      <div class="visit-success" id="visitSuccess">
+        <div class="visit-success-check">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
+        </div>
+        <div class="visit-success-text">Pedido enviado!<br>Um consultor da Avante vai te chamar no WhatsApp pra confirmar o dia e horário.</div>
+      </div>
+
+      <button class="btn-primary" type="submit" id="visitSubmitBtn">Pedir visita →</button>
     </form>
   </div>
 </div>

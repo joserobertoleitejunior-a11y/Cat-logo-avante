@@ -105,7 +105,7 @@ const { chromium } = require('playwright');
   await page2.fill('#visitEmpresa', 'Bridge Empresa');
   await page2.fill('#visitCidade', 'Bridge Cidade');
   await page2.fill('#visitTelefone', '11955556666');
-  await page2.selectOption('#visitDia', 'Segunda');
+  await page2.click('[data-day="Segunda"]');
   await page2.click('#visitSubmitBtn');
   await page2.waitForTimeout(300);
   // confirma que o número de whatsapp configurado no admin foi refletido no catálogo
