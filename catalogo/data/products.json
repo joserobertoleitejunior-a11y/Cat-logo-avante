@@ -581,14 +581,14 @@
     "dept": "Balas & Doces (Oliveira)",
     "section": "Bala de Banana Oliveira 500gr",
     "bbox": {
-      "left_pct": 34.57,
-      "top_pct": 26.42,
-      "width_pct": 55.27,
-      "height_pct": 13.4
+      "left_pct": 34.55,
+      "top_pct": 26.45,
+      "width_pct": 17.09,
+      "height_pct": 13.36
     },
-    "name": "Bala de Banana Oliveira 300gr Bala de Banana Oliveira Bala de Banana Oliveira",
-    "caixa": "Caixa : 36 x 150gr",
-    "codigo": "7896202891903",
+    "name": "Bala de Banana Oliveira 300gr",
+    "caixa": "Caixa: 50 x 300gr pacotes",
+    "codigo": "7896202820200",
     "via": "pdf"
   },
   {
@@ -1052,7 +1052,7 @@
     },
     "name": "Amendoim c/ Mel",
     "caixa": "",
-    "codigo": "7896079811585",
+    "codigo": "7896079811684",
     "via": "pdf"
   },
   {
@@ -2318,5 +2318,133 @@
     "caixa": "Display c/ 10 x 4 unidades Caixa Emb.:: 16 Displays",
     "codigo": "4904530138225",
     "via": "pdf"
+  },
+  {
+    "page": 18,
+    "brand": "",
+    "dept": "Balas & Doces (Oliveira)",
+    "section": "Bala de Banana Oliveira 500gr",
+    "bbox": {
+      "left_pct": 53.7,
+      "top_pct": 26.45,
+      "width_pct": 17.09,
+      "height_pct": 13.36
+    },
+    "name": "Bala de Banana Oliveira 150gr",
+    "caixa": "Caixa : 36 x 150gr",
+    "codigo": "7896202891903",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 18,
+    "brand": "",
+    "dept": "Balas & Doces (Oliveira)",
+    "section": "Bala de Banana Oliveira 500gr",
+    "bbox": {
+      "left_pct": 72.85,
+      "top_pct": 26.45,
+      "width_pct": 16.97,
+      "height_pct": 13.36
+    },
+    "name": "Bala de Banana Oliveira 50gr",
+    "caixa": "Caixa : 100 x 50gr",
+    "codigo": "7896202892108",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 41,
+    "brand": "",
+    "dept": "Chocolates & Bombons",
+    "section": "Linha Torrone - Varejo",
+    "bbox": {
+      "left_pct": 24.0,
+      "top_pct": 27.0,
+      "width_pct": 16.61,
+      "height_pct": 7.82
+    },
+    "name": "Castanha de Caju",
+    "caixa": "Caixa c/8 display, Display c/12 x 45g",
+    "codigo": "7896079813381",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 41,
+    "brand": "",
+    "dept": "Chocolates & Bombons",
+    "section": "Linha Torrone - Varejo",
+    "bbox": {
+      "left_pct": 24.0,
+      "top_pct": 37.0,
+      "width_pct": 16.61,
+      "height_pct": 7.82
+    },
+    "name": "Amendoim c/ Limão",
+    "caixa": "",
+    "codigo": "7896079811486",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 41,
+    "brand": "",
+    "dept": "Chocolates & Bombons",
+    "section": "Linha Torrone - Varejo",
+    "bbox": {
+      "left_pct": 24.0,
+      "top_pct": 45.18,
+      "width_pct": 16.61,
+      "height_pct": 7.82
+    },
+    "name": "Amendoim c/ Cereja",
+    "caixa": "",
+    "codigo": "7896079811585",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 56,
+    "brand": "",
+    "dept": "Amendoim & Paçoca (Dadinho)",
+    "section": "Wafer Dadinho Avelã",
+    "bbox": {
+      "left_pct": 36.36,
+      "top_pct": 15.0,
+      "width_pct": 20.61,
+      "height_pct": 25.0
+    },
+    "name": "Paçoca Dadinho Quadrada 8x20gr",
+    "caixa": "Display c/ 8, Cx. Emb. 24 Display",
+    "codigo": "17898530842432",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 56,
+    "brand": "",
+    "dept": "Amendoim & Paçoca (Dadinho)",
+    "section": "Wafer Dadinho Avelã",
+    "bbox": {
+      "left_pct": 50.91,
+      "top_pct": 41.36,
+      "width_pct": 26.67,
+      "height_pct": 21.36
+    },
+    "name": "Paçoca Dadinho Quadrada 8x18gr ZERO",
+    "caixa": "Display c/ 8, Cx. Emb. 24 Display",
+    "codigo": "17898530842432",
+    "via": "pdf-audit-2026-08"
+  },
+  {
+    "page": 92,
+    "brand": "Toshiba",
+    "dept": "Pilhas",
+    "section": "Pilhas Alcalinas Toshiba",
+    "bbox": {
+      "left_pct": 48.24,
+      "top_pct": 18.64,
+      "width_pct": 20.85,
+      "height_pct": 22.27
+    },
+    "name": "Pilha Alcalina 2A",
+    "caixa": "Cod : LR6GCP, Display c/ 12 x 2 unidades, Caixa Emb.:: 12 Displays",
+    "codigo": "4904530102530",
+    "via": "pdf-audit-2026-08"
   }
 ]
