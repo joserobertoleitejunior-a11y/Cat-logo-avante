@@ -40,9 +40,6 @@ const { chromium } = require('playwright');
   console.log('OK: flag salva no localStorage');
 
   // catálogo continua 100% funcional depois de dispensar a splash
-  // (default agora é Catálogo Rápido; entra no modo Revista pra testar a navegação de página)
-  await page.click('#modeBookBtn');
-  await page.waitForTimeout(400);
   await page.click('#nextBtn');
   await page.waitForTimeout(900);
   const label2 = await page.textContent('#pageLabel');

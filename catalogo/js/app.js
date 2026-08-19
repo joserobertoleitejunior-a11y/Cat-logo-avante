@@ -144,11 +144,9 @@ function buildBook(){
 
 function fitBook(){
   stageEl = document.getElementById('stage');
-  // Enquanto a view da revista está oculta (modo Catálogo Rápido usa display:none),
-  // #stage mede 0x0 — se um resize disparar nesse momento (rotação de tela, teclado
-  // abrindo/fechando, troca de aba), o livro ficava preso no tamanho mínimo de
-  // fallback pro resto da sessão. Ignorar o recálculo enquanto estiver oculto resolve;
-  // switchMode() já rechama fitBook() ao voltar pra Revista, então nada fica desatualizado.
+  // Se um resize disparar antes do #stage ter medida real (aba em segundo plano,
+  // primeiro paint), o livro ficava preso no tamanho mínimo de fallback pro resto da
+  // sessão — ignorar o recálculo até #stage ter tamanho de verdade resolve.
   if(stageEl.clientWidth < 10 || stageEl.clientHeight < 10) return;
   const availW = stageEl.clientWidth - 16;
   const availH = stageEl.clientHeight - 8;
@@ -454,7 +452,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
   document.getElementById('viewInBookBtn').addEventListener('click', ()=>{
     goTo(currentProduct.page);
-    switchMode(false);
     closeDrawer('productDrawer');
   });
 });
@@ -462,34 +459,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
 // ============ CARRINHO / ORÇAMENTO ============
 function isInCart(codigo){ return CART.some(c => c.codigo === codigo); }
 
-// Atualiza o estado visual de "selecionado" em todo lugar que mostra produtos —
-// selo com check nos hotspots da revista, card destacado + botão "no orçamento"
-// no Catálogo Rápido. Assim o cliente sempre vê, olhando a página ou a grade,
-// o que já escolheu — sem precisar abrir o carrinho toda hora.
+// Atualiza o selo de "já selecionado" em todo hotspot da revista que corresponde a um
+// item do carrinho — assim o cliente sempre vê, olhando a página, o que já escolheu.
 function refreshSelectionUI(){
   const inCartCodes = new Set(CART.map(c => c.codigo));
-  // com o filtro "só selecionados" ligado, desmarcar um item precisa sumir com o card
-  // na hora — em vez de chamar renderGrid() de novo (o que re-chamaria essa função e
-  // criaria um loop), só removemos da tela o card que deixou de estar no carrinho.
-  const onlySelBox = document.getElementById('onlySelected');
-  if(onlySelBox && onlySelBox.checked){
-    document.querySelectorAll('.card[data-codigo]').forEach(card => {
-      if(!inCartCodes.has(card.dataset.codigo)) card.remove();
-    });
-    const grid = document.getElementById('grid');
-    if(grid && !grid.querySelector('.card')){
-      grid.innerHTML = '<div class="empty-state">Nenhum item selecionado ainda.<br>Toque em "+ Orçamento" nos produtos que quiser.</div>';
-    }
-  }
-  document.querySelectorAll('.card[data-codigo]').forEach(card => {
-    const sel = inCartCodes.has(card.dataset.codigo);
-    card.classList.toggle('selected', sel);
-    const btn = card.querySelector('.btn-sm.primary');
-    if(btn){
-      btn.textContent = sel ? '✓ No orçamento' : '+ Orçamento';
-      btn.classList.toggle('in-cart', sel);
-    }
-  });
   document.querySelectorAll('.hotspot[data-codigo]').forEach(hs => {
     hs.classList.toggle('selected', inCartCodes.has(hs.dataset.codigo));
   });
@@ -519,7 +492,7 @@ function renderCartBadge(){
 function renderCartDrawer(){
   const body = document.getElementById('cartItems');
   if(CART.length===0){
-    body.innerHTML = '<div class="empty-state">Seu orçamento está vazio.<br>Toque em qualquer produto da revista ou do Catálogo Rápido pra adicionar.</div>';
+    body.innerHTML = '<div class="empty-state">Seu orçamento está vazio.<br>Toque em qualquer produto da revista pra adicionar.</div>';
     document.getElementById('cartFooter').style.display='none';
     return;
   }
@@ -647,9 +620,9 @@ function buildToc(){
   });
 }
 
-// ============ CATÁLOGO RÁPIDO ============
+// ============ NOME DE PRODUTO ============
 // nomes vêm em CAIXA ALTA do catálogo escaneado original — deixamos em title case
-// pra ficar com cara de vitrine/e-commerce em vez de etiqueta de estoque.
+// pra ficar com cara de vitrine em vez de etiqueta de estoque.
 const NAME_LOWER_WORDS = new Set(['e','de','da','do','das','dos','com','para','em']);
 // alguns nomes vieram do catálogo escaneado com código interno (REF/Cód/EAN/DUN/Validade/
 // preço de tabela) grudado no final do próprio campo "nome" — igual ao "Cód: X · Pág. Y"
@@ -673,124 +646,39 @@ function prettyName(raw){
   }).join(' ');
 }
 
-let activeDept = null;
-function buildBrandFilter(){
-  const sel = document.getElementById('brandFilter');
-  const brands = Array.from(new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  brands.forEach(b=>{
-    const opt = document.createElement('option');
-    opt.value = b; opt.textContent = b;
-    sel.appendChild(opt);
-  });
-}
-function buildChips(){
-  const depts = Array.from(new Set(PRODUCTS.map(p=>p.dept).filter(Boolean)));
-  const row = document.getElementById('chipRow');
-  row.innerHTML = '';
-  const all = document.createElement('div');
-  all.className = 'chip active'; all.textContent = 'Todos os departamentos';
-  all.addEventListener('click', ()=>{ activeDept=null; buildChips(); renderGrid(); });
-  row.appendChild(all);
-  depts.forEach(d=>{
-    const c = document.createElement('div');
-    c.className = 'chip' + (activeDept===d?' active':'');
-    c.textContent = d;
-    c.addEventListener('click', ()=>{ activeDept = activeDept===d?null:d; buildChips(); renderGrid(); });
-    row.appendChild(c);
-  });
-  if(activeDept===null) all.classList.add('active'); else all.classList.remove('active');
-}
-function renderGrid(){
-  const q = document.getElementById('fastSearch').value.trim().toLowerCase();
-  const brand = document.getElementById('brandFilter').value;
-  const sort = document.getElementById('sortFilter').value;
-  const onlySelected = document.getElementById('onlySelected').checked;
-  const inCartCodes = new Set(CART.map(c=>c.codigo));
-  const grid = document.getElementById('grid');
-  let filtered = PRODUCTS.filter(p=>{
-    if(activeDept && p.dept!==activeDept) return false;
-    if(brand && p.brand!==brand) return false;
-    if(onlySelected && !inCartCodes.has(p.codigo)) return false;
-    if(!q) return true;
-    return (p.name+' '+p.brand+' '+p.section+' '+p.dept+' '+p.codigo).toLowerCase().includes(q);
-  });
-  if(sort==='name') filtered = filtered.slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
-  else if(sort==='brand') filtered = filtered.slice().sort((a,b)=>(a.brand||'').localeCompare(b.brand||'','pt-BR') || a.name.localeCompare(b.name,'pt-BR'));
-  else filtered = filtered.slice().sort((a,b)=>a.page-b.page);
-  document.getElementById('resultCount').textContent = `${filtered.length} produto(s) — base de ${PRODUCTS.length} SKUs digitalizados`;
-  grid.innerHTML = '';
-  if(!filtered.length){
-    grid.innerHTML = '<div class="empty-state">Nada encontrado com esse filtro.<br>Use o modo Revista pra folhear todas as páginas.</div>';
+// ============ BUSCA (dentro do índice) ============
+// Busca por produto (nome/marca/código) direto na gaveta do índice — substitui o que
+// antes era a busca do Catálogo Rápido, agora que a Revista é o único modo do site.
+function renderTocSearch(q){
+  const list = document.getElementById('tocList');
+  const resEl = document.getElementById('tocSearchResults');
+  if(!q){
+    list.style.display = '';
+    resEl.style.display = 'none';
+    resEl.innerHTML = '';
     return;
   }
-  filtered.forEach((p,idx)=>{
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.dataset.codigo = p.codigo;
-    // cascata só nos primeiros cards visíveis — acima disso o atraso ficaria perceptível
-    // demais esperando carregar uma lista grande, então tudo depois de ~24 entra junto.
-    card.style.setProperty('--card-delay', (Math.min(idx,24) * 18) + 'ms');
-    // vitrine de prateleira: só nome + marca + embalagem, sem código/página exposto —
-    // esses dados continuam disponíveis na ficha do produto (openProduct) pra uso interno.
-    card.innerHTML = `
-      <div class="img-wrap">
-        <span class="sel-badge">✓</span>
-        <img src="${p.photo}" alt="${prettyName(p.name)}" loading="lazy">
-      </div>
-      <div class="card-body">
-        <div class="cbrand">${p.brand||p.dept}</div>
-        <div class="cname">${prettyName(p.name)}</div>
-        <div class="cmeta">${p.caixa||''}</div>
-        <div class="cactions">
-          <button class="btn-sm primary">+ Orçamento</button>
-          <button class="btn-sm">Ver produto</button>
-        </div>
-      </div>`;
-    card.querySelector('img').addEventListener('click', ()=>openProduct(p));
-    card.querySelector('.cname').addEventListener('click', ()=>openProduct(p));
-    // toque único seleciona/desseleciona — o "cada item selecionado" que o cliente pediu:
-    // não precisa abrir o produto pra escolher, um toque já marca (e outro toque desmarca).
-    card.querySelector('.btn-sm.primary').addEventListener('click', ()=>{
-      if(isInCart(p.codigo)) removeFromCart(p.codigo);
-      else addToCart(p,1);
+  list.style.display = 'none';
+  resEl.style.display = '';
+  const results = PRODUCTS.filter(p =>
+    (p.name+' '+(p.brand||'')+' '+(p.section||'')+' '+(p.dept||'')+' '+p.codigo).toLowerCase().includes(q)
+  );
+  if(!results.length){
+    resEl.innerHTML = '<div class="empty-state" style="padding:40px 16px;">Nada encontrado.<br>Tenta outro nome ou marca.</div>';
+    return;
+  }
+  resEl.innerHTML = results.slice(0, 40).map(p => `
+    <div class="toc-item" data-codigo="${p.codigo}">
+      <img src="${p.photo}" alt="${prettyName(p.name)}" loading="lazy">
+      <div><div class="ttl">${prettyName(p.name)}</div><div class="sub">${p.brand?p.brand+' · ':''}pág. ${p.page}</div></div>
+    </div>`).join('');
+  resEl.querySelectorAll('.toc-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const p = PRODUCTS.find(x => x.codigo === el.dataset.codigo);
+      if(p) goTo(p.page);
+      closeDrawer('tocDrawer');
     });
-    card.querySelectorAll('.btn-sm')[1].addEventListener('click', ()=>openProduct(p));
-    grid.appendChild(card);
   });
-  refreshSelectionUI();
-}
-
-// ============ MODOS (Revista / Catálogo Rápido) ============
-let modeSwitchTimer = null;
-function switchMode(fast){
-  const showEl = document.getElementById(fast ? 'fastView' : 'revistaView');
-  const hideEl = document.getElementById(fast ? 'revistaView' : 'fastView');
-  if(showEl.classList.contains('active') && !showEl.classList.contains('leaving')) return; // já é o modo atual
-
-  document.getElementById('app').classList.toggle('mode-fast', fast);
-  document.getElementById('modeBookBtn').classList.toggle('active', !fast);
-  document.getElementById('modeFastBtn').classList.toggle('active', fast);
-
-  // crossfade em vez de troca seca — some qualquer transição pendente de um clique rápido
-  // anterior antes de começar uma nova, pra não deixar classe "leaving" grudada pra sempre.
-  if(modeSwitchTimer) clearTimeout(modeSwitchTimer);
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('leaving','entering'));
-
-  hideEl.classList.remove('active');
-  hideEl.classList.add('leaving');
-  showEl.classList.add('active','entering');
-  // remove as classes só depois que as animações (220ms/340ms no CSS) já terminaram de
-  // rodar — removendo cedo demais (ex: no próximo frame) cortava o fade pela metade.
-  modeSwitchTimer = setTimeout(()=>{
-    hideEl.classList.remove('leaving');
-    showEl.classList.remove('entering');
-    modeSwitchTimer = null;
-  }, 360);
-
-  // ao voltar pra Revista, o #stage estava com display:none (medindo 0x0) enquanto o
-  // Catálogo Rápido estava ativo — se algo mudou de tamanho nesse meio tempo (rotação,
-  // teclado), o livro precisa recalcular o próprio tamanho agora que é visível de novo.
-  if(!fast) fitBook();
 }
 
 // ============ INIT ============
@@ -801,9 +689,6 @@ async function init(){
   setupDrag();
   render();
   buildToc();
-  buildChips();
-  buildBrandFilter();
-  renderGrid();
   renderCartBadge();
 
   document.getElementById('prevBtn').addEventListener('click', prev);
@@ -812,13 +697,10 @@ async function init(){
     if(e.key==='ArrowRight') next();
     if(e.key==='ArrowLeft') prev();
   });
-  document.getElementById('modeBookBtn').addEventListener('click', ()=>switchMode(false));
-  document.getElementById('modeFastBtn').addEventListener('click', ()=>switchMode(true));
   document.getElementById('tocBtn').addEventListener('click', ()=>openDrawer('tocDrawer'));
-  document.getElementById('fastSearch').addEventListener('input', renderGrid);
-  document.getElementById('brandFilter').addEventListener('change', renderGrid);
-  document.getElementById('sortFilter').addEventListener('change', renderGrid);
-  document.getElementById('onlySelected').addEventListener('change', renderGrid);
+  document.getElementById('tocSearch').addEventListener('input', e=>{
+    renderTocSearch(e.target.value.trim().toLowerCase());
+  });
   document.getElementById('searchTop').addEventListener('keydown', e=>{
     if(e.key!=='Enter') return;
     const q = e.target.value.trim().toLowerCase();

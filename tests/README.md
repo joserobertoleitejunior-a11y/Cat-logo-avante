@@ -1,8 +1,8 @@
 # Suite de testes E2E — AVANTE Catálogo Digital
 
-12 arquivos Playwright, ~90 verificações, cobrindo revista (flipbook), catálogo rápido,
-carrinho/orçamento, IA vendedora (chat), painel admin (`crm/crm_dashboard.html`), PIN
-gate, splash, tema escuro, menu, filtros, transição entre modos e pedido de visita.
+10 arquivos Playwright cobrindo a revista (flipbook, único modo do site), busca de
+produto pelo índice, carrinho/orçamento, IA vendedora (chat), painel admin
+(`crm/crm_dashboard.html`), PIN gate, splash, tema escuro, menu e pedido de visita.
 
 Como rodar:
 
@@ -22,13 +22,12 @@ instalado num caminho customizado (como acontece em alguns sandboxes), defina
 `PW_CHROMIUM_PATH=/caminho/pro/chrome` antes de rodar — sem a variável, ele usa o
 Chromium padrão baixado pelo `playwright install`.
 
-## Observação importante pra quem for mexer no default de visualização
+## Sobre o modo único (Revista)
 
-`test_splash.js`, `test_drag_from_hotspot.js`, `test_fitbook_bug.js` e `test_revista2.js`
-clicam em `#modeBookBtn` antes de testar qualquer coisa específica do modo Revista
-(flipbook), porque o modo padrão de abertura do site é o Catálogo Rápido (grade de
-produtos), não mais a revista escaneada. Se esse padrão mudar de novo no futuro, esses
-4 arquivos são os que precisam de ajuste.
+O site voltou a ter só um modo — a revista/flipbook — depois de o Catálogo Rápido
+(grade de produtos) ter sido removido. A busca por produto (nome/marca/código) que
+antes vivia no Catálogo Rápido agora mora dentro do índice (`#tocBtn` → `#tocSearch`),
+testada em `test_revista2.js` e `test_new_features.js`.
 
 ## Rodando depois de qualquer mudança visual/de dados
 
